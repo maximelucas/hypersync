@@ -17,9 +17,9 @@ __all__ = [
 ]
 
 
-def plot_series(thetas, times, ax=None, n=None):
+def plot_series(thetas, times, color="grey", alpha=0.1, n=None, ax=None, **kwargs):
     """
-    Plot time series of sin(theta) for the given phases thetas.
+    Plot sin(theta) over time for the given phases thetas.
 
     Parameters
     ----------
@@ -27,10 +27,16 @@ def plot_series(thetas, times, ax=None, n=None):
         The values of the phases.
     times : ndarray
         The corresponding times.
+    color : color
+        Color of the lines 
+    alpha : float
+        Transparency of the lines
     ax : Matplotlib axis, optional
         The Matplotlib axis to plot on, by default None (creates a new axis).
     n : int, optional
         The number of thetas to plot, by default None (plots all thetas).
+    **kwargs
+        Additional arguments that will be passed to matplotlib's plot.
 
     Returns
     -------
@@ -43,7 +49,7 @@ def plot_series(thetas, times, ax=None, n=None):
 
     # plot time series
     for theta in thetas[:n]:
-        ax.plot(times, np.sin(theta), c="grey", alpha=0.1)
+        ax.plot(times, np.sin(theta), c=color, alpha=alpha, **kwargs)
 
     ax.set_xlabel("Time")
     ax.set_ylabel(r"$\sin(\theta)$")
@@ -51,9 +57,9 @@ def plot_series(thetas, times, ax=None, n=None):
     return ax
 
 
-def plot_order_param(thetas, times, ax=None, order=1, color="r", ls="-"):
+def plot_order_param(thetas, times,  order=1, color="r", ls="-", ax=None, **kwargs):
     """
-    Plot the order parameter for the given phases thetas.
+    Plot the order parameter over time for the given phases thetas.
 
     Parameters
     ----------
@@ -69,6 +75,8 @@ def plot_order_param(thetas, times, ax=None, order=1, color="r", ls="-"):
         The color of the plot, by default "r".
     ls : str, optional
         The line style of the plot, by default "-".
+    **kwargs
+        Additional arguments that will be passed to matplotlib's plot.
 
     Returns
     -------
@@ -81,7 +89,7 @@ def plot_order_param(thetas, times, ax=None, order=1, color="r", ls="-"):
 
     N = len(thetas)
     R = np.sum(np.exp(1j * order * thetas), axis=0) / N
-    ax.plot(times, np.abs(R), c=color, ls=ls, label=f"$R_{order}$")
+    ax.plot(times, np.abs(R), c=color, ls=ls, label=f"$R_{order}$", **kwargs)
 
     ax.set_xlabel("Time")
     ax.set_ylabel(r"$R$")
@@ -90,20 +98,20 @@ def plot_order_param(thetas, times, ax=None, order=1, color="r", ls="-"):
     return ax
 
 
-def plot_phases(thetas, it, ax=None, color="b", ms=2):
+def plot_phases(thetas, radius=1, color="b", ms=2, ax=None, **kwargs):
     """
-    Plot the phase of oscillators at time `it` on a circle.
+    Plot the phase thetas of oscillators on a circle.
 
     Parameters
     ----------
     thetas : np.ndarray
         The phase of each oscillator over time. Shape is (N, T).
-    it : int
-        The time index to plot the phase plot for.
     ax : plt.Axes, optional
         The axes to plot on, by default None.
     color : str, optional
         The color of the phase plot, by default "b".
+    **kwargs
+        Additional arguments that will be passed to matplotlib's plot.
 
     Returns
     -------
@@ -113,12 +121,13 @@ def plot_phases(thetas, it, ax=None, color="b", ms=2):
     if ax is None:
         ax = plt.gca()
 
-    ax.plot(
-        np.cos(thetas[:, it]), np.sin(thetas[:, it]), "o", c=color, ms=ms, alpha=0.3
-    )
-
+    # draw circle as reference
     circle = np.linspace(0, 2 * np.pi, num=100, endpoint=False)
-    ax.plot(np.cos(circle), np.sin(circle), "-", c="lightgrey", zorder=-2)
+    ax.plot(radius*np.cos(circle), radius*np.sin(circle), "-", c="lightgrey")
+
+    # draw phases
+    ax.plot(radius*np.cos(thetas), radius*np.sin(thetas), "o", c=color, ms=ms, **kwargs)
+
     sb.despine(ax=ax, left=True, bottom=True)
     ax.set_yticks([])
     ax.set_xticks([])
@@ -127,9 +136,9 @@ def plot_phases(thetas, it, ax=None, color="b", ms=2):
     return ax
 
 
-def plot_phases_line(thetas, it=-1, ax=None, **kwargs):
+def plot_phases_line(thetas, ax=None, **kwargs):
     """
-    Plot the phases of oscillators at time `it` in order of node index.
+    Plot the phases thetas of oscillators in order of node index.
 
     Parameters
     ----------
@@ -151,11 +160,7 @@ def plot_phases_line(thetas, it=-1, ax=None, **kwargs):
     if ax is None:
         ax = plt.gca()
 
-    psi = thetas[:, it]
-
-    ax.plot(psi % (2 * np.pi), "o", **kwargs)
-
-    sb.despine()
+    ax.plot(thetas % (2 * np.pi), "o", **kwargs)
 
     ax.set_ylim([-0.1, 2 * np.pi + 0.1])
     ax.set_yticks([0, np.pi, 2 * np.pi])
@@ -167,7 +172,7 @@ def plot_phases_line(thetas, it=-1, ax=None, **kwargs):
     return ax
 
 
-def plot_phases_ring(H, thetas, it=-1, ax=None, colorbar=True, **kwargs):
+def plot_phases_ring(H, thetas, cmap="twilight", ax=None, colorbar=True, **kwargs):
     """
     Plot the phase of oscillators at time `it` on a circle.
 
@@ -179,9 +184,9 @@ def plot_phases_ring(H, thetas, it=-1, ax=None, colorbar=True, **kwargs):
     H : xgi Hypergraph
         Hypergraph to plot
     thetas : np.ndarray
-        The phase of each oscillator over time. Shape is (N, T).
-    it : int
-        The time index to plot the phase plot for. Default: -1.
+        The phase of each oscillator over time. Shape is (N,).
+    cmap : colormap
+        Colormap used to map the phases to colors
     ax : plt.Axes, optional
         The axes to plot on, by default None.
     colorbar : bool, optional
@@ -199,16 +204,16 @@ def plot_phases_ring(H, thetas, it=-1, ax=None, colorbar=True, **kwargs):
 
     pos = xgi.circular_layout(H)
 
-    psi = thetas[:, it] % (2 * np.pi)
+    thetas = thetas % (2 * np.pi)
 
     ax, im = xgi.draw_nodes(
         H,
         pos=pos,
         ax=ax,
-        node_fc=psi,
+        node_fc=thetas,
         vmin=0,
         vmax=2 * np.pi,
-        node_fc_cmap="twilight",
+        node_fc_cmap=cmap,
         **kwargs,
     )
 
@@ -220,7 +225,7 @@ def plot_phases_ring(H, thetas, it=-1, ax=None, colorbar=True, **kwargs):
     return ax, im
 
 
-def plot_sync(thetas, times, n=None):
+def plot_sync(thetas, times, n=None, figsize=(4, 2), width_ratios=[3, 1]):
     """
     Plot the time series of oscillators, their phase plots, and the order parameter.
 
@@ -240,15 +245,14 @@ def plot_sync(thetas, times, n=None):
         (`fig`, `axs`) where `fig` is a `plt.Figure` and `axs` is a numpy ndarray of `plt.Axes`.
     """
 
-    fig, axs = plt.subplots(2, 2, figsize=(4, 2), width_ratios=[3, 1], sharex="col")
+    fig, axs = plt.subplots(2, 2, figsize=figsize, width_ratios=width_ratios, sharex="col")
 
     plot_series(thetas, times, ax=axs[0, 0], n=n)
 
     plot_order_param(thetas, times, ax=axs[1, 0], order=1)
     plot_order_param(thetas, times, ax=axs[1, 0], order=2, ls="--")
 
-    plot_phases(thetas, 0, ax=axs[0, 1], color="b")
-
-    plot_phases(thetas, -1, ax=axs[1, 1], color="b")
+    plot_phases(thetas[0], ax=axs[0, 1])
+    plot_phases(thetas[-1], ax=axs[1, 1])
 
     return fig, axs

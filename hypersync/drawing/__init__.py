@@ -1,6 +1,2 @@
-from . import (
-    draw,
-
-)
+from . import draw
 from .draw import *
-

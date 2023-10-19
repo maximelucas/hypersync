@@ -1,8 +1,3 @@
-from . import (
-    generate,
-    integrate
-
-)
+from . import generate, integrate
 from .generate import *
 from .integrate import *
-

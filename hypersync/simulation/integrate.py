@@ -7,14 +7,14 @@ from math import sin
 
 import numpy as np
 import xgi
-from scipy.integrate import solve_ivp
 from numba import jit
-
+from scipy.integrate import solve_ivp
 
 __all__ = [
     "rhs_ring_nb",
     "simulate_kuramoto",
 ]
+
 
 @jit(nopython=True)
 def rhs_ring_nb(t, theta, omega, k1, k2, r):

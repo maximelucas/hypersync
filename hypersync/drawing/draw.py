@@ -28,7 +28,7 @@ def plot_series(thetas, times, color="grey", alpha=0.1, n=None, ax=None, **kwarg
     times : ndarray
         The corresponding times.
     color : color
-        Color of the lines 
+        Color of the lines
     alpha : float
         Transparency of the lines
     ax : Matplotlib axis, optional
@@ -57,7 +57,7 @@ def plot_series(thetas, times, color="grey", alpha=0.1, n=None, ax=None, **kwarg
     return ax
 
 
-def plot_order_param(thetas, times,  order=1, color="r", ls="-", ax=None, **kwargs):
+def plot_order_param(thetas, times, order=1, color="r", ls="-", ax=None, **kwargs):
     """
     Plot the order parameter over time for the given phases thetas.
 
@@ -123,10 +123,12 @@ def plot_phases(thetas, radius=1, color="b", ms=2, ax=None, **kwargs):
 
     # draw circle as reference
     circle = np.linspace(0, 2 * np.pi, num=100, endpoint=False)
-    ax.plot(radius*np.cos(circle), radius*np.sin(circle), "-", c="lightgrey")
+    ax.plot(radius * np.cos(circle), radius * np.sin(circle), "-", c="lightgrey")
 
     # draw phases
-    ax.plot(radius*np.cos(thetas), radius*np.sin(thetas), "o", c=color, ms=ms, **kwargs)
+    ax.plot(
+        radius * np.cos(thetas), radius * np.sin(thetas), "o", c=color, ms=ms, **kwargs
+    )
 
     sb.despine(ax=ax, left=True, bottom=True)
     ax.set_yticks([])
@@ -245,7 +247,9 @@ def plot_sync(thetas, times, n=None, figsize=(4, 2), width_ratios=[3, 1]):
         (`fig`, `axs`) where `fig` is a `plt.Figure` and `axs` is a numpy ndarray of `plt.Axes`.
     """
 
-    fig, axs = plt.subplots(2, 2, figsize=figsize, width_ratios=width_ratios, sharex="col")
+    fig, axs = plt.subplots(
+        2, 2, figsize=figsize, width_ratios=width_ratios, sharex="col"
+    )
 
     plot_series(thetas, times, ax=axs[0, 0], n=n)
 

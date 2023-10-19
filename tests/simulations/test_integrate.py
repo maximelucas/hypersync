@@ -3,6 +3,7 @@ import pytest
 
 import hypersync as hs
 
+
 def test_rhs_ring_nb():
 
     omega = 0

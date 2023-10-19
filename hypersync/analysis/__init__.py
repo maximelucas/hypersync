@@ -1,6 +1,2 @@
-from . import (
-    identify,
-
-)
+from . import identify
 from .identify import *
-

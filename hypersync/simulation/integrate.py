@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 @jit(nopython=True)
-def rhs_ring_nb(t, theta, omega, k1, k2, r1, r2):
+def rhs_ring_nb(t, theta, omega, k1, k2, r):
     """
     RHS
 
@@ -25,7 +25,7 @@ def rhs_ring_nb(t, theta, omega, k1, k2, r1, r2):
     ----------
     sigma : float
         Triplet coupling strength
-    K1, K2 : int
+    r : int
         Pairwise and triplet nearest neighbour ranges
     """
 
@@ -35,8 +35,8 @@ def rhs_ring_nb(t, theta, omega, k1, k2, r1, r2):
     triplets = np.zeros(N)
 
     # triadic coupling
-    idx_2 = list(range(-r2, 0)) + list(range(1, r2 + 1))
-    idx_1 = range(-r1, r1 + 1)
+    idx_2 = list(range(-r, 0)) + list(range(1, r + 1))
+    idx_1 = range(-r, r + 1)
 
     for ii in range(N):
         for jj in idx_1:  # pairwise
@@ -51,13 +51,11 @@ def rhs_ring_nb(t, theta, omega, k1, k2, r1, r2):
                     # x2 to count triangles in both directions
                     triplets[ii] += 2 * sin(theta[kkk] + theta[jjj] - 2 * theta[ii])
 
-    return (k1 / r1) * pairwise + k2 / (r2 * (2 * r2 - 1)) * triplets
+    return (k1 / r) * pairwise + k2 / (r * (2 * r - 1)) * triplets
 
 
 def simulate_kuramoto(
     H,
-    k1,
-    k2,
     omega=None,
     theta_0=None,
     t_end=100,
@@ -80,10 +78,6 @@ def simulate_kuramoto(
         standard deviation 1 is used.
     theta_0 : array-like, optional
         Initial phases of each node. If not given, a random phase is used.
-    k1 : float, optional
-        Coupling strength for pairwise interactions.
-    k2 : float, optional
-        Coupling strength for triplet interactions.
     t_end : float, optional
         End time of the integration
     dt : float, optional
@@ -123,17 +117,20 @@ def simulate_kuramoto(
     if integrator == "explicit_euler":
         for it in range(1, n_t):
             thetas[:, it] = thetas[:, it - 1] + dt * rhs(
-                0, thetas[:, it - 1], omega, k1, k2, *args
+                0, thetas[:, it - 1], omega, *args
             )
     else:
-        thetas = solve_ivp(
+        solution = solve_ivp(
             fun=rhs,
             t_span=[times[0], times[-1]],
             y0=theta_0,
             t_eval=times,
             method=integrator,
-            args=(omega, k1, k2, *args),
+            args=(omega, *args),
             **options
-        ).y
+        )
+
+        thetas = solution.y
+        times = solution.t
 
     return thetas, times

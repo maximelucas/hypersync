@@ -22,7 +22,8 @@ def identify_state(thetas, atol=1e-3):
     thetas : array-like, shape (n_phases,)
         Phases of the oscillators.
     atol : float, optional
-        The absolute tolerance used for comparison with synchronization parameters. Default is 1e-3.
+        The absolute tolerance used for comparison with synchronization parameters.
+        Default is 1e-3.
 
     Returns:
     --------
@@ -44,9 +45,9 @@ def identify_state(thetas, atol=1e-3):
         diff, 2 * np.pi, atol=atol
     )
 
-    q, is_twisted = identify_winding_number(thetas)
+    q, is_twisted = identify_q_twisted(thetas)
     sorted_thetas = np.sort(thetas, axis=0)  # sort along node axis
-    q_sorted, is_splay = identify_winding_number(sorted_thetas)
+    q_sorted, is_splay = identify_q_twisted(sorted_thetas)
 
     try:
         is_2clust, sizes2 = identify_k_clusters(thetas, k=2, atol=1e-2)
@@ -89,7 +90,8 @@ def identify_k_clusters(thetas, k, atol=1e-2):
     k : int
         Number of clusters
     atol : float, optional
-        The absolute tolerance used for comparison with synchronization parameters. Default is 1e-2.
+        The absolute tolerance used for comparison with synchronization 
+        parameters. Default is 1e-2.
 
     Returns:
     --------
@@ -107,10 +109,12 @@ def identify_k_clusters(thetas, k, atol=1e-2):
     psi = np.sort(psi)
 
     diff = np.diff(psi)
-    idcs = np.where(diff > dist / 2)[0]
+    # identify jumps larger than half the expected inter-cluster distance
+    idcs = np.where(diff >= 0.45 * dist)[0]
 
     clusters = []
     n_changes = len(idcs)
+    # partition phases in clusters separated by the jumps
     for i in range(n_changes + 1):
         start = idcs[i - 1] + 1 if i > 0 else None
         end = idcs[i] + 1 if i < n_changes else None
@@ -122,10 +126,12 @@ def identify_k_clusters(thetas, k, atol=1e-2):
     is_k_clusters = True  # changed below if False
     sizes = [0] * k
 
+    # check if each cluster is compact enough
     for i in range(n_changes + 1):
         if np.mean(np.diff(clusters[i])) > atol:  # cluster is not compact
             is_k_clusters = False
 
+    # check if the clusters have the right distance between them
     for i in range(n_changes):
         dist_ij = abs(np.mean(clusters[i]) - np.mean(clusters[i + 1]))
         if abs(dist_ij - dist) > atol:
@@ -142,11 +148,12 @@ def identify_k_clusters(thetas, k, atol=1e-2):
     return is_k_clusters, sizes
 
 
-def identify_winding_number(thetas, atol=1e-1):
+def identify_q_twisted(thetas, atol=1e-1):
     """
     Check if twisted state and identify its winding number.
 
-    The winding number indicates how many times the phase angles wind around the unit circle.
+    The winding number indicates how many times the phase 
+    angles wind around the unit circle.
 
     Parameters:
     -----------
@@ -155,11 +162,12 @@ def identify_winding_number(thetas, atol=1e-1):
 
     Returns:
     --------
-    w_no : int
-        The winding number, indicating how many times the phase angles wind around the unit circle.
+    q : int
+        The winding number, indicating how many times the phase 
+        angles wind around the unit circle.
     is_twisted_state : bool
-        True if the phase differences are close to their mean, indicating a twisted state;
-        False otherwise.
+        True if the phase differences are close to their mean, 
+        indicating a twisted state; False otherwise.
     """
     thetas = thetas % (2 * np.pi)  # ensure it's mod 2 pi
 
@@ -170,10 +178,10 @@ def identify_winding_number(thetas, atol=1e-1):
     diff = np.where(diff < -np.pi, diff + 2 * np.pi, diff)
 
     q = np.sum(diff)
-    w_no = round(q / (2 * np.pi))
+    q = round(q / (2 * np.pi)) # winding number
     is_twisted_state = norm(diff - np.mean(diff)) < atol
 
-    return w_no, is_twisted_state
+    return q, is_twisted_state
 
 
 def order_parameter(thetas, order=1, complex=False, axis=0):
@@ -190,9 +198,11 @@ def order_parameter(thetas, order=1, complex=False, axis=0):
     order : int, optional
         The order of the order parameter. Default is 1.
     complex : bool, optional
-        If True, return the complex order parameter. If False (default), return its magnitude.
+        If True, return the complex order parameter. If False (default), 
+        return its magnitude.
     axis : int, optional
-        The axis of length n_oscillators, along which the sum of the phases is taken. Default is 0.
+        The axis of length n_oscillators, along which the sum of the phases 
+        is taken. Default is 0.
 
     Returns:
     --------

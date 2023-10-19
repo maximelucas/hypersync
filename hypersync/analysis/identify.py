@@ -13,16 +13,14 @@ __all__ = [
 ]
 
 
-def identify_state(thetas, t=-1, atol=1e-3):
+def identify_state(thetas, atol=1e-3):
     """
     Identify the synchronization state.
 
     Parameters:
     -----------
-    thetas : array-like, shape (n_phases, n_time_steps)
-        Phases of the oscillators over time
-    t : int, optional
-        The index of the time step to analyze. Default is -1, indicating the last time step.
+    thetas : array-like, shape (n_phases,)
+        Phases of the oscillators.
     atol : float, optional
         The absolute tolerance used for comparison with synchronization parameters. Default is 1e-3.
 
@@ -41,24 +39,24 @@ def identify_state(thetas, t=-1, atol=1e-3):
     R1 = order_parameter(thetas, order=1)
     # R2 = order_parameter(thetas, order=2)
     # R3 = order_parameter(thetas, order=3)
-    diff = np.diff(thetas[:, t], append=thetas[0, t]) % (2 * np.pi)
+    diff = np.diff(thetas, append=thetas[0]) % (2 * np.pi)
     is_diff_zero = np.isclose(diff, 0, atol=atol) + np.isclose(
         diff, 2 * np.pi, atol=atol
     )
 
-    q, is_twisted = identify_winding_number(thetas, t=-1)
+    q, is_twisted = identify_winding_number(thetas)
     sorted_thetas = np.sort(thetas, axis=0)  # sort along node axis
-    q_sorted, is_splay = identify_winding_number(sorted_thetas, t=-1)
+    q_sorted, is_splay = identify_winding_number(sorted_thetas)
 
     try:
-        is_2clust, sizes2 = identify_k_clusters(thetas, k=2, t=-1, atol=1e-2)
+        is_2clust, sizes2 = identify_k_clusters(thetas, k=2, atol=1e-2)
     except Exception as err:
         is_2clust = False
         sizes2 = []
         print(err)
 
     try:
-        is_3clust, sizes3 = identify_k_clusters(thetas, k=3, t=-1, atol=1e-2)
+        is_3clust, sizes3 = identify_k_clusters(thetas, k=3, atol=1e-2)
     except Exception as err:
         is_3clust = False
         sizes3 = []
@@ -78,7 +76,7 @@ def identify_state(thetas, t=-1, atol=1e-3):
         return "other"
 
 
-def identify_k_clusters(thetas, k, t, atol=1e-2):
+def identify_k_clusters(thetas, k, atol=1e-2):
     """
     Check if k-cluster state.
 
@@ -86,12 +84,12 @@ def identify_k_clusters(thetas, k, t, atol=1e-2):
 
     Parameters:
     -----------
-    thetas : array-like, shape (n_phases, n_time_steps)
-        Phases of the oscillators over time
+    thetas : array-like, shape (n_phases, )
+        Phases of the oscillators.
     k : int
         Number of clusters
-    t : int
-        The index of the time step for which the winding number and twisted state are calculated.
+    atol : float, optional
+        The absolute tolerance used for comparison with synchronization parameters. Default is 1e-2.
 
     Returns:
     --------
@@ -105,7 +103,7 @@ def identify_k_clusters(thetas, k, t, atol=1e-2):
     dist = 2 * np.pi / n_clust
     N = len(thetas)
 
-    psi = thetas[:, t] % (2 * np.pi)
+    psi = thetas % (2 * np.pi)
     psi = np.sort(psi)
 
     diff = np.diff(psi)
@@ -144,7 +142,7 @@ def identify_k_clusters(thetas, k, t, atol=1e-2):
     return is_k_clusters, sizes
 
 
-def identify_winding_number(thetas, t, atol=1e-1):
+def identify_winding_number(thetas, atol=1e-1):
     """
     Check if twisted state and identify its winding number.
 
@@ -152,10 +150,8 @@ def identify_winding_number(thetas, t, atol=1e-1):
 
     Parameters:
     -----------
-    thetas : array-like, shape (n_phases, n_time_steps)
-        Phases of the oscillators over time
-    t : int
-        The index of the time step for which the winding number and twisted state are calculated.
+    thetas : array-like, shape (n_phases,)
+        Phases of the oscillators.
 
     Returns:
     --------
@@ -167,7 +163,7 @@ def identify_winding_number(thetas, t, atol=1e-1):
     """
     thetas = thetas % (2 * np.pi)  # ensure it's mod 2 pi
 
-    diff = np.diff(thetas[:, t], prepend=thetas[-1, t])
+    diff = np.diff(thetas, prepend=thetas[-1])
 
     # ensure phase diffs are in [-pi, pi]
     diff = np.where(diff > np.pi, diff - 2 * np.pi, diff)

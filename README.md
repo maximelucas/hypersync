@@ -1,1 +1,1 @@
-# hyper-sync
+# hypersync

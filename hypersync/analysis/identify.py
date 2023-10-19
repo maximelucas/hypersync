@@ -8,7 +8,7 @@ from numpy.linalg import norm
 __all__ = [
     "identify_state",
     "identify_k_clusters",
-    "identify_winding_number",
+    "identify_q_twisted",
     "order_parameter",
 ]
 

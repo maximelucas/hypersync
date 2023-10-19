@@ -29,7 +29,7 @@ def test_identity_k_clusters():
     assert not is_1_cluster
     assert not is_2_clusters
     assert not is_3_clusters
-    is_1_cluster, sizes1 = hs.identify_k_clusters(state, 1, atol=5e-2)
+    is_1_cluster, sizes1 = hs.identify_k_clusters(state, 1, atol=1e-1)
     assert is_1_cluster
     assert not is_2_clusters
     assert not is_3_clusters

@@ -90,7 +90,7 @@ def identify_k_clusters(thetas, k, atol=1e-2):
     k : int
         Number of clusters
     atol : float, optional
-        The absolute tolerance used for comparison with synchronization 
+        The absolute tolerance used for comparison with synchronization
         parameters. Default is 1e-2.
 
     Returns:
@@ -152,7 +152,7 @@ def identify_q_twisted(thetas, atol=1e-1):
     """
     Check if twisted state and identify its winding number.
 
-    The winding number indicates how many times the phase 
+    The winding number indicates how many times the phase
     angles wind around the unit circle.
 
     Parameters:
@@ -163,10 +163,10 @@ def identify_q_twisted(thetas, atol=1e-1):
     Returns:
     --------
     q : int
-        The winding number, indicating how many times the phase 
+        The winding number, indicating how many times the phase
         angles wind around the unit circle.
     is_twisted_state : bool
-        True if the phase differences are close to their mean, 
+        True if the phase differences are close to their mean,
         indicating a twisted state; False otherwise.
     """
     thetas = thetas % (2 * np.pi)  # ensure it's mod 2 pi
@@ -178,7 +178,7 @@ def identify_q_twisted(thetas, atol=1e-1):
     diff = np.where(diff < -np.pi, diff + 2 * np.pi, diff)
 
     q = np.sum(diff)
-    q = round(q / (2 * np.pi)) # winding number
+    q = round(q / (2 * np.pi))  # winding number
     is_twisted_state = norm(diff - np.mean(diff)) < atol
 
     return q, is_twisted_state
@@ -198,10 +198,10 @@ def order_parameter(thetas, order=1, complex=False, axis=0):
     order : int, optional
         The order of the order parameter. Default is 1.
     complex : bool, optional
-        If True, return the complex order parameter. If False (default), 
+        If True, return the complex order parameter. If False (default),
         return its magnitude.
     axis : int, optional
-        The axis of length n_oscillators, along which the sum of the phases 
+        The axis of length n_oscillators, along which the sum of the phases
         is taken. Default is 0.
 
     Returns:

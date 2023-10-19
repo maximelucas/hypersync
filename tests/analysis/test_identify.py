@@ -49,4 +49,3 @@ def test_identity_k_clusters():
     assert is_2_clusters
     assert np.allclose(sizes2, ps, atol=1e-3)
     assert not is_3_clusters
-

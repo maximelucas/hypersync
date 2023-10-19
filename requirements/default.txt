@@ -5,3 +5,5 @@ networkx>=2.7
 requests>=2.0
 matplotlib>=3.4
 xgi>=0.7.2
+seaborn>=0.12
+numba>=0.58

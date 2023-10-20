@@ -50,6 +50,7 @@ def test_identity_k_clusters():
     assert np.allclose(sorted(sizes2), ps, atol=1e-2)
     assert not is_3_clusters
 
+
 def test_order_parameter():
 
     N = 100
@@ -64,20 +65,20 @@ def test_order_parameter():
     R1 = hs.order_parameter(psi, order=1)
     R2 = hs.order_parameter(psi, order=2)
 
-    assert R1.shape == (n_times, )
-    assert R2.shape == (n_times, )
+    assert R1.shape == (n_times,)
+    assert R2.shape == (n_times,)
     assert np.allclose(R1, 1)
     assert np.allclose(R2, 1)
 
     # synthetic incoherent state rotating
-    psi_0 = np.linspace(0, 2*np.pi, endpoint=False, num=N)
+    psi_0 = np.linspace(0, 2 * np.pi, endpoint=False, num=N)
     psi = psi_0[:, None] + w * times
 
     R1 = hs.order_parameter(psi, order=1)
     R2 = hs.order_parameter(psi, order=2)
 
-    assert R1.shape == (n_times, )
-    assert R2.shape == (n_times, )
+    assert R1.shape == (n_times,)
+    assert R2.shape == (n_times,)
     assert np.allclose(R1, 0)
     assert np.allclose(R2, 0)
 
@@ -92,12 +93,7 @@ def test_order_parameter():
     R1 = hs.order_parameter(psi, order=1)
     R2 = hs.order_parameter(psi, order=2)
 
-    assert R1.shape == (n_times, )
-    assert R2.shape == (n_times, )
+    assert R1.shape == (n_times,)
+    assert R2.shape == (n_times,)
     assert np.allclose(R1, 0.6, atol=1e-3)
     assert np.allclose(R2, 1, atol=1e-3)
-
-
-
-
-

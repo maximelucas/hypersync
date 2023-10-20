@@ -137,7 +137,9 @@ def generate_state(N, kind="random", noise=1e-2, seed=None, **kwargs):
     elif kind == "q-twisted":
         psi_init = generate_q_twisted_state(N, **kwargs, noise=noise, seed=seed)
     else:
-        raise ValueError("Unknown kind.")
+        raise ValueError(
+            "Unknown kind. Kind must be one of 'sync', 'random', 'splay', 'k-cluster', 'q-twister'."
+        )
 
     if kind in ["sync", "splay"]:
         psi_init += perturbation

@@ -34,17 +34,28 @@ def simulate_kuramoto(
     H : Hypergraph
         Hypergraph on which to simulate coupled oscillators
     omega : float or array-like, optional
-        Natural frequencies of each node. If not given, a random normal distribution with mean 0 and
-        standard deviation 1 is used.
+        Natural frequencies of each node. If None (default), a random normal distribution 
+        with mean 0 and standard deviation 1 is used.
     theta_0 : array-like, optional
-        Initial phases of each node. If not given, a random phase is used.
+        Initial phases of each node. If None (default), random phases are drawn uniformly
+        on [0, 2pi[.
     t_end : float, optional
-        End time of the integration
+        End time of the integration. (Default: 100)
     dt : float, optional
-        Time step for the simulation.
+        Time step for the simulation. (Default: 0.01)
+    rhs : function, optional
+        Function that defines the rhs of the ODE to integrate. Must output an np.ndarray
+        of length H.num_nodes. Its first three arguments should be `t`, `theta`, and `omega`.
+        Other arguments coming after those can be specified via `args`.(Default: rhs_ring_nb)
     integrator : str, optional
-        Integration method to use. Either "explicit_euler" or any method supported by
+        Integration method to use. Either "explicit_euler" (default) or any method supported by
         scipy.integrate.solve_ivp.
+    args : tuple
+        Arguments to pass to the `rhs` function (other that `t`, `theta`, and `omega`).
+        (Default: None, which raises an error).
+    **options: 
+        Additional keyword arguments to be passed to scipy's solve_ivp in case `integrator`
+        is not "explicit_euler".
 
     Returns
     -------

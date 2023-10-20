@@ -71,3 +71,5 @@ def test_simulate_kuramoto():
     # errors
     with pytest.raises(ValueError):
         hs.simulate_kuramoto(H, integrator="RK46", args=args)
+    with pytest.raises(TypeError):
+        hs.simulate_kuramoto(H)

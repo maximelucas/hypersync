@@ -1,7 +1,52 @@
 import numpy as np
 import pytest
+import xgi
 
 import hypersync as hs
+
+
+def test_rhs_pairwise_meso(hypergraph0, state1):
+
+    omega = 0
+    k1 = 1
+    H = hypergraph0
+    H = xgi.convert_labels_to_integers(H, "label")
+
+    links = H.edges.filterby("order", 1).members()
+
+    psi = np.array([0, np.pi / 2, np.pi / 2, 0, np.pi])
+    psi_out = hs.rhs_pairwise_meso(0, psi, omega, k1, links)
+    assert np.allclose(psi_out, [0.4, -0.2, -0.2, 0, 0])
+
+    # random ic
+    psi_out = hs.rhs_pairwise_meso(0, state1, omega, k1, links)
+    assert np.allclose(
+        psi_out, [0.33054527, -0.15332373, -0.00983145, -0.32393079, 0.15654069]
+    )
+
+    # consistency with other rhs
+    adj1 = xgi.adjacency_matrix(H, order=1)
+    psi_out2 = hs.rhs_pairwise_adj(0, state1, omega, k1, adj1)
+    assert np.allclose(psi_out, psi_out2)
+
+
+def test_rhs_pairwise_adj(hypergraph0, state1):
+
+    omega = 0
+    k1 = 1
+    H = hypergraph0
+    H = xgi.convert_labels_to_integers(H, "label")
+
+    adj1 = xgi.adjacency_matrix(H, order=1)
+    psi_out = hs.rhs_pairwise_adj(0, state1, omega, k1, adj1)
+    assert np.allclose(
+        psi_out, [0.33054527, -0.15332373, -0.00983145, -0.32393079, 0.15654069]
+    )
+
+    # consistency with other rhs
+    links = H.edges.filterby("order", 1).members()
+    psi_out2 = hs.rhs_pairwise_meso(0, state1, omega, k1, links)
+    assert np.allclose(psi_out, psi_out2)
 
 
 def test_rhs_ring_nb():

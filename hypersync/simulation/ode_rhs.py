@@ -10,8 +10,58 @@ import xgi
 from numba import jit
 
 __all__ = [
+    "rhs_pairwise_meso",
+    "rhs_pairwise_adj",
     "rhs_ring_nb",
 ]
+
+
+def rhs_pairwise_meso(t, psi, omega, k1, links):
+    """Right-hand side of the ODE.
+    Only pairwise.
+    Coupling function: sin(oj - oi)
+
+    Parameters
+    ----------
+    t: float
+        Time
+    psi: array of float
+        Phases to integrate
+    """
+
+    N = len(psi)
+    pairwise = np.zeros(N)
+
+    for i, j in links:
+        # sin(oj - oi)
+        oi = psi[i]
+        oj = psi[j]
+        pairwise[i] += sin(oj - oi)
+        pairwise[j] += sin(oi - oj)
+
+    return omega + (k1 / N) * pairwise
+
+
+def rhs_pairwise_adj(t, psi, omega, k1, adj1):
+    """Right-hand side of the ODE.
+    All-to-all, only pairwise.
+    Coupling function: sin(oj - oi)
+
+    Parameters
+    ----------
+    t: float
+        Time
+    psi: array of float
+        Phases to integrate
+    """
+
+    N = len(psi)
+    sin_psi = np.sin(psi)
+    cos_psi = np.cos(psi)
+
+    pairwise = adj1.dot(sin_psi) * cos_psi - adj1.dot(cos_psi) * sin_psi
+
+    return omega + (k1 / N) * pairwise
 
 
 @jit(nopython=True)

@@ -17,9 +17,11 @@ __all__ = [
 
 
 def rhs_pairwise_meso(t, psi, omega, k1, links):
-    """Right-hand side of the ODE.
-    Only pairwise.
-    Coupling function: sin(oj - oi)
+    """Right-hand side of the ODE, only pairwise coupling.
+
+    Coupling function: sin(oj - oi). This is the usual Kuramoto 
+    model on complex networks. This version of the function loops
+    over links.
 
     Parameters
     ----------
@@ -27,6 +29,13 @@ def rhs_pairwise_meso(t, psi, omega, k1, links):
         Time
     psi: array of float
         Phases to integrate
+    omega : float or array of floats
+        Natural frequencies of the oscillators
+    k1 : float
+        Coupling strength
+    links : list of tuples
+        List of pairwise links, in the form of list/tuple/set 
+        of two elements.
     """
 
     N = len(psi)
@@ -43,9 +52,11 @@ def rhs_pairwise_meso(t, psi, omega, k1, links):
 
 
 def rhs_pairwise_adj(t, psi, omega, k1, adj1):
-    """Right-hand side of the ODE.
-    All-to-all, only pairwise.
-    Coupling function: sin(oj - oi)
+    """Right-hand side of the ODE, only pairwise coupling.
+
+    Coupling function: sin(oj - oi). This is the usual Kuramoto 
+    model on complex networks. This version of the function uses
+    matrix multiplication.
 
     Parameters
     ----------
@@ -53,6 +64,12 @@ def rhs_pairwise_adj(t, psi, omega, k1, adj1):
         Time
     psi: array of float
         Phases to integrate
+    omega : float or array of floats
+        Natural frequencies of the oscillators
+    k1 : float
+        Coupling strength
+    adj1 : ndarray 
+        Adjacency matrix (of order 1) of shape (N, N). 
     """
 
     N = len(psi)

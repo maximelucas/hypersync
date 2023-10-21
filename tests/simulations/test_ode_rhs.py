@@ -4,6 +4,20 @@ import xgi
 
 import hypersync as hs
 
+def test_rhs_pairwise_a2a(state2): 
+
+    omega = 1
+    k1 = 1
+    N = 10
+
+    psi_out = hs.rhs_pairwise_a2a(0, state2, omega, k1)
+
+    # coherence with other rhs
+    H = xgi.complete_hypergraph(N, max_order=2)
+    adj1 = xgi.adjacency_matrix(H, order=1)
+    psi_out2 = hs.rhs_pairwise_adj(0, state2, omega, k1, adj1)
+    assert np.allclose(psi_out, psi_out2)
+
 
 def test_rhs_pairwise_meso(hypergraph0, state1):
 

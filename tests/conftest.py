@@ -12,6 +12,17 @@ def state1():
     N = 5
     return hs.generate_state(N, ic="random", seed=1)
 
+@pytest.fixture
+def state2():
+    N = 10
+    return hs.generate_state(N, ic="random", seed=1)
+
+
+@pytest.fixture
+def state3():
+    N = 100
+    return hs.generate_state(N, ic="random", seed=1)
+
 
 @pytest.fixture
 def edgelist1():

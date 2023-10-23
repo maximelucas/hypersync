@@ -14,6 +14,7 @@ __all__ = [
     "rhs_pairwise_meso",
     "rhs_pairwise_adj",
     "rhs_triplet_sym_meso",
+    "rhs_triplet_asym_meso",
     "rhs_ring_nb",
 ]
 
@@ -223,6 +224,57 @@ def rhs_triplet_asym_meso(t, psi, omega, k2, triangles):
 
 
 @jit(nopython=True)
+def rhs_23_sym_nb(t, theta, omega, k1, k2):
+    """
+    ODE RHS for coupled oscillators on a ring network.
+
+    The coupling range is r, and interactions are pairwise and triadic.
+    The coupling functions are:
+    * sin(oj - oi)
+    * sin(oj + ok - 2oi)
+
+    Parameters
+    ----------
+    t : float
+        Time (does not affect the result, there for consistency with integrators).
+    theta : numpy ndarray
+        Phases of the oscillators at time t.
+    omega : float or array of floats
+        Frequencies of the oscillators.
+    k1 : float
+        Pairwise coupling strength
+    k2 : float
+        Triadic coupling strength
+
+    Returns
+    -------
+    array
+        Amount to add to the phases to update them after one integration step.
+
+    """
+
+    N = len(theta)
+
+    pairwise = np.zeros(N)
+    triplets = np.zeros(N)
+
+    for ii in range(N):
+        for jj in range(N):  # pairwise
+            jjj = (ii + jj) % N
+            pairwise[ii] += sin(theta[jjj] - theta[ii])
+
+            for kk in range(N):
+                if jj < kk:  # because coupling function is symmetric in j and k
+                    jjj = (ii + jj) % N
+                    kkk = (ii + kk) % N
+                    # x2 to count triangles in both directions
+                    triplets[ii] += 2 * sin(theta[kkk] + theta[jjj] - 2 * theta[ii])
+
+    return omega + (k1 / N) * pairwise + k2 / (N**2) * triplets
+
+
+
+@jit(nopython=True)
 def rhs_ring_nb(t, theta, omega, k1, k2, r):
     """
     ODE RHS for coupled oscillators on a ring network.
@@ -259,7 +311,6 @@ def rhs_ring_nb(t, theta, omega, k1, k2, r):
     pairwise = np.zeros(N)
     triplets = np.zeros(N)
 
-    # triadic coupling
     idx_2 = list(range(-r, 0)) + list(range(1, r + 1))
     idx_1 = range(-r, r + 1)
 

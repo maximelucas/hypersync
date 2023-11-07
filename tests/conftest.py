@@ -12,6 +12,7 @@ def state1():
     N = 5
     return hs.generate_state(N, ic="random", seed=1)
 
+
 @pytest.fixture
 def state2():
     N = 10

@@ -4,7 +4,8 @@ import xgi
 
 import hypersync as hs
 
-def test_rhs_pairwise_a2a(state2): 
+
+def test_rhs_pairwise_a2a(state2):
 
     omega = 1
     k1 = 1

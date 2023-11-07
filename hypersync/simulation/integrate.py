@@ -91,7 +91,6 @@ def simulate_kuramoto(
                 0, thetas[:, it - 1], omega, *args
             )
     else:
-        print(t_eval)
         solution = solve_ivp(
             fun=rhs,
             t_span=[times[0], times[-1]],

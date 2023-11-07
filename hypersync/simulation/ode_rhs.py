@@ -15,6 +15,8 @@ __all__ = [
     "rhs_pairwise_adj",
     "rhs_triplet_sym_meso",
     "rhs_triplet_asym_meso",
+    "rhs_23_sym_nb",
+    "rhs_23_asym_nb",
     "rhs_ring_nb",
 ]
 
@@ -22,7 +24,7 @@ __all__ = [
 def rhs_pairwise_a2a(t, psi, omega, k1):
     """Right-hand side of the ODE, all-to-all pairwise coupling.
 
-    Coupling function: sin(oj - oi). This is the original Kuramoto 
+    Coupling function: sin(oj - oi). This is the original Kuramoto
     model. This version uses an optimisation avoiding matrix products.
 
     Parameters
@@ -226,7 +228,7 @@ def rhs_triplet_asym_meso(t, psi, omega, k2, triangles):
 @jit(nopython=True)
 def rhs_23_sym_nb(t, theta, omega, k1, k2):
     """
-    ODE RHS for coupled oscillators on a ring network.
+    ODE RHS for coupled oscillators on a complete network.
 
     The coupling range is r, and interactions are pairwise and triadic.
     The coupling functions are:
@@ -272,6 +274,53 @@ def rhs_23_sym_nb(t, theta, omega, k1, k2):
 
     return omega + (k1 / N) * pairwise + k2 / (N**2) * triplets
 
+
+@jit(nopython=True)
+def rhs_23_asym_nb(t, theta, omega, k1, k2):
+    """
+    ODE RHS for coupled oscillators on a complete network.
+
+    The coupling range is r, and interactions are pairwise and triadic.
+    The coupling functions are:
+    * sin(oj - oi)
+    * sin(2oj - ok - oi)
+
+    Parameters
+    ----------
+    t : float
+        Time (does not affect the result, there for consistency with integrators).
+    theta : numpy ndarray
+        Phases of the oscillators at time t.
+    omega : float or array of floats
+        Frequencies of the oscillators.
+    k1 : float
+        Pairwise coupling strength
+    k2 : float
+        Triadic coupling strength
+
+    Returns
+    -------
+    array
+        Amount to add to the phases to update them after one integration step.
+
+    """
+
+    N = len(theta)
+
+    pairwise = np.zeros(N)
+    triplets = np.zeros(N)
+
+    for ii in range(N):
+        for jj in range(N):  # pairwise
+            jjj = (ii + jj) % N
+            pairwise[ii] += sin(theta[jjj] - theta[ii])
+
+            for kk in range(N):
+                jjj = (ii + jj) % N
+                kkk = (ii + kk) % N
+                triplets[ii] += sin(-theta[kkk] + 2 * theta[jjj] - theta[ii])
+
+    return omega + (k1 / N) * pairwise + k2 / (N**2) * triplets
 
 
 @jit(nopython=True)

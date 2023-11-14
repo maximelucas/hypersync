@@ -7,7 +7,7 @@ import numpy as np
 import xgi
 from scipy.integrate import solve_ivp
 
-from .ode_rhs import rhs_ring_nb
+from .ode_rhs import rhs_23_sym_nb
 
 __all__ = [
     "simulate_kuramoto",

@@ -67,7 +67,7 @@ def identify_state(thetas, atol=1e-3):
         return f"{q}-twisted"
     elif is_splay and q_sorted == 1:
         return "splay"
-    elif np.isclose(R1[t], 1, atol=atol) and np.all(is_diff_zero):
+    elif np.isclose(R1, 1, atol=atol) and np.all(is_diff_zero):
         return "sync"
     elif is_2clust:
         return "2-cluster"

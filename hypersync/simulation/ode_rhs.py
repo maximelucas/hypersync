@@ -13,11 +13,13 @@ __all__ = [
     "rhs_pairwise_a2a",
     "rhs_pairwise_meso",
     "rhs_pairwise_adj",
+    "rhs_pairwise_a2a_harmonic", 
     "rhs_triplet_sym_meso",
     "rhs_triplet_asym_meso",
     "rhs_23_sym_nb",
     "rhs_23_asym_nb",
-    "rhs_ring_nb",
+    "rhs_ring_23_sym_nb",
+    "rhs_ring_23_asym_nb",
 ]
 
 
@@ -141,6 +143,59 @@ def rhs_pairwise_adj(t, psi, omega, k1, adj1):
     pairwise = adj1.dot(sin_psi) * cos_psi - adj1.dot(cos_psi) * sin_psi
 
     return omega + (k1 / N) * pairwise
+
+
+def rhs_pairwise_a2a_harmonic(t, psi, omega, k1, k2):
+    """Right-hand side of the ODE, all-to-all pairwise coupling.
+
+    Coupling function: k1 * sin(oj - oi) + k2 * sin(2 oj - 2 oi). 
+    This is the original Kuramoto model with a harmonic added. 
+    This version uses an optimisation avoiding matrix products.
+
+    Parameters
+    ----------
+    t: float
+        Time
+    psi: array of float
+        Phases to integrate
+    omega : float or array of floats
+        Natural frequencies of the oscillators
+    k1 : float
+        Coupling strength of the 
+    k2 : float
+
+    Returns
+    -------
+    array of floats of length N
+
+    See also
+    --------
+    rhs_pairwise_meso
+    rhs_pairwise_adj
+    """
+
+    N = len(psi)
+    sin_psi = np.sin(psi)
+    cos_psi = np.cos(psi)
+
+    sum_cos_psi = np.sum(cos_psi)
+    sum_sin_psi = np.sum(sin_psi)
+
+    # oj - oi
+    pairwise = -sum_cos_psi * sin_psi + sum_sin_psi * cos_psi
+
+    sum_cos_psi_sq = np.sum(cos_psi**2)
+    sum_sin_psi_sq = np.sum(sin_psi**2)
+
+    # 2oj - 2oi
+    pairwise_harmonic = 2 * (
+        -cos_psi * sin_psi * sum_cos_psi_sq
+        + cos_psi**2 * np.sum(cos_psi * sin_psi)
+        - sin_psi**2 * np.sum(cos_psi * sin_psi)
+        + cos_psi * sin_psi * sum_sin_psi_sq
+    )
+
+    return omega + (k1 / N) * pairwise + (k2 / N) * pairwise_harmonic
 
 
 def rhs_triplet_sym_meso(t, psi, omega, k2, triangles):
@@ -324,7 +379,7 @@ def rhs_23_asym_nb(t, theta, omega, k1, k2):
 
 
 @jit(nopython=True)
-def rhs_ring_nb(t, theta, omega, k1, k2, r):
+def rhs_ring_23_sym_nb(t, theta, omega, k1, k2, r):
     """
     ODE RHS for coupled oscillators on a ring network.
 
@@ -377,3 +432,59 @@ def rhs_ring_nb(t, theta, omega, k1, k2, r):
                     triplets[ii] += 2 * sin(theta[kkk] + theta[jjj] - 2 * theta[ii])
 
     return omega + (k1 / r) * pairwise + k2 / (r * (2 * r - 1)) * triplets
+
+
+@jit(nopython=True)
+def rhs_ring_23_asym_nb(t, theta, omega, k1, k2, r):
+    """
+    ODE RHS for coupled oscillators on a ring network.
+
+    The coupling range is r, and interactions are pairwise and triadic.
+    The coupling functions are:
+    * sin(Oj - Oi)
+    * sin(Oj + Ok - 2 Oi)
+
+    Parameters
+    ----------
+    t : float
+        Time (does not affect the result, there for consistency with integrators).
+    theta : numpy ndarray
+        Phases of the oscillators at time t.
+    omega : float or array of floats
+        Frequencies of the oscillators.
+    k1 : float
+        Pairwise coupling strength
+    k2 : float
+        Triadic coupling strength
+    r : int
+        Pairwise and triplet nearest neighbour ranges
+
+    Returns
+    -------
+    array
+        Amount to add to the phases to update them after one integration step.
+
+    """
+
+    N = len(theta)
+
+    pairwise = np.zeros(N)
+    triplets = np.zeros(N)
+
+    idx_2 = list(range(-r, 0)) + list(range(1, r + 1))
+    idx_1 = range(-r, r + 1)
+
+    for ii in range(N):
+        for jj in idx_1:  # pairwise
+            jjj = (ii + jj) % N
+            pairwise[ii] += sin(theta[jjj] - theta[ii])
+
+        for jj in idx_2:  # triplet
+            for kk in idx_2:
+                if jj != kk:
+                    jjj = (ii + jj) % N
+                    kkk = (ii + kk) % N
+                    triplets[ii] += sin(-theta[kkk] + 2 * theta[jjj] - theta[ii])
+
+    return omega + (k1 / r) * pairwise + k2 / (r * (2 * r - 1)) * triplets
+

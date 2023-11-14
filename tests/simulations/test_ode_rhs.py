@@ -64,7 +64,7 @@ def test_rhs_pairwise_adj(hypergraph0, state1):
     assert np.allclose(psi_out, psi_out2)
 
 
-def test_rhs_ring_nb():
+def test_rhs_ring_23_asym_nb():
 
     omega = 0
     k1 = 1
@@ -74,29 +74,29 @@ def test_rhs_ring_nb():
     r = 1
     psi = np.array([0, np.pi / 2, 0, np.pi / 2])
     N = len(psi)
-    psi_out = hs.rhs_ring_nb(0, psi, omega, k1, k2, r)
+    psi_out = hs.rhs_ring_23_sym_nb(0, psi, omega, k1, k2, r)
     assert np.allclose(psi_out, [2, -2, 2, -2])
 
     # r = 2
     r = 2
     psi = np.array([0, np.pi / 2, 0, np.pi / 2])
     N = len(psi)
-    psi_out = hs.rhs_ring_nb(0, psi, omega, k1, k2, r)
+    psi_out = hs.rhs_ring_23_sym_nb(0, psi, omega, k1, k2, r)
     assert np.allclose(psi_out, [2.3333, -2.3333, 2.3333, -2.3333], atol=1e-3)
 
     # sync
     psi = np.ones(N)
-    psi_out = hs.rhs_ring_nb(0, psi, omega, k1, k2, r)
+    psi_out = hs.rhs_ring_23_sym_nb(0, psi, omega, k1, k2, r)
     assert np.allclose(psi_out, 0)
 
     # 2-cluster
     psi = np.array([1, 1 + np.pi, 1, 1 + np.pi])
-    psi_out = hs.rhs_ring_nb(0, psi, omega, k1, k2, r)
+    psi_out = hs.rhs_ring_23_sym_nb(0, psi, omega, k1, k2, r)
     assert np.allclose(psi_out, 0)
 
     # random
     psi = hs.generate_state(10, kind="random", seed=1)
-    psi_out = hs.rhs_ring_nb(0, psi, omega, k1, k2, r)
+    psi_out = hs.rhs_ring_23_sym_nb(0, psi, omega, k1, k2, r)
     assert np.allclose(
         psi_out,
         [

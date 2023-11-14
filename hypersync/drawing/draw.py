@@ -233,8 +233,7 @@ def plot_sync(thetas, times, n=None, figsize=(4, 2), width_ratios=[3, 1]):
 
     Parameters
     ----------
-            Hypergraph to plot
-            thetas : np.ndarray
+    thetas : np.ndarray
         The phase of each oscillator over time. Shape is (N, T).
     times : np.ndarray
         The time stamps for the `thetas` data.
@@ -256,7 +255,7 @@ def plot_sync(thetas, times, n=None, figsize=(4, 2), width_ratios=[3, 1]):
     plot_order_param(thetas, times, ax=axs[1, 0], order=1)
     plot_order_param(thetas, times, ax=axs[1, 0], order=2, ls="--")
 
-    plot_phases(thetas[0], ax=axs[0, 1])
-    plot_phases(thetas[-1], ax=axs[1, 1])
+    plot_phases(thetas[:, 0], ax=axs[0, 1])
+    plot_phases(thetas[:, -1], ax=axs[1, 1])
 
     return fig, axs

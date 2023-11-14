@@ -9,13 +9,12 @@ def test_simulate_kuramoto():
 
     # test ring ode (structure is in the ode)
 
-    N = 100
+    N = 20
     H = xgi.trivial_hypergraph(N)
 
     k1 = 1
     k2 = 1
-    r = 2
-    args = (k1, k2, r)
+    args = (k1, k2)
 
     thetas_out, times_out = hs.simulate_kuramoto(H, args=args)
 

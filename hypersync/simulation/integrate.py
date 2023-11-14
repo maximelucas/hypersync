@@ -75,7 +75,7 @@ def simulate_kuramoto(
         theta_0 = np.random.random(N) * 2 * np.pi
 
     if rhs is None:
-        rhs = rhs_ring_nb
+        rhs = rhs_23_sym_nb
 
     times = np.arange(0, t_end + dt / 2, dt)
     n_t = len(times)

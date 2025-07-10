@@ -56,7 +56,7 @@ plt.show()
 
 ## Credits
 
-hypersync is makes use of XGI for higher-order interactions and Scipy's solve_ivp() for ODE integration.
+hypersync makes use of [XGI](https://xgi.readthedocs.io/en/stable/) for higher-order interactions and Scipy's [solve_ivp()](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html) for ODE integration.
 
 Released under the 3-Clause BSD license.
 

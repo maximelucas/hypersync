@@ -265,7 +265,7 @@ def plot_sync(thetas, times, n=None, figsize=(4, 2), width_ratios=[3, 1]):
     return fig, axs
 
 
-def plot_summary(thetas, times, H, tag_params="", suffix=""):
+def plot_summary(thetas, times, H):
 
     N, n_t = thetas.shape
 
@@ -276,7 +276,7 @@ def plot_summary(thetas, times, H, tag_params="", suffix=""):
     plot_order_param(thetas, times, ax=axs[1, 0], order=1)
     plot_order_param(thetas, times, ax=axs[1, 0], order=2, ls="--")
     axs[0, 0].set_xlabel("")
-    axs[1, 0].legend(loc="best", fontsize="x-small", frameon=False)
+    axs[1, 0].legend(loc="lower right", fontsize="x-small", frameon=False)
 
     plot_phases(thetas[:, 0], ax=axs[0, 1])
     plot_phases(thetas[:, -1], ax=axs[1, 1])
@@ -307,8 +307,5 @@ def plot_summary(thetas, times, H, tag_params="", suffix=""):
     sb.despine(ax=axins)
 
     plt.subplots_adjust(hspace=0.5, top=0.8)
-    identity = hs.identify_state(thetas[:, -1])
-
-    fig.suptitle(f"{tag_params}, {suffix}, {identity}", fontsize="small")
 
     return fig

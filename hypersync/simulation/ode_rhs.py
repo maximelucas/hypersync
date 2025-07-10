@@ -10,6 +10,7 @@ import xgi
 from numba import jit
 
 __all__ = [
+    "rhs_23_sym",
     "rhs_pairwise_a2a",
     "rhs_pairwise_meso",
     "rhs_pairwise_adj",

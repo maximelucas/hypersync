@@ -142,8 +142,9 @@ def identify_k_clusters(thetas, k, atol=1e-2):
     elif n_clust == len(clusters) - 1:
         sizes = [len(cluster) / N for cluster in clusters[:-1]]
         sizes[0] += len(clusters[-1])  # 0th and last clusters are the same
-    else:
-        raise ValueError("k must be equal to or one unit below len(cluster)")
+    else: # too many clusters found, can be a k-cluster state with larger k
+        is_k_clusters = False
+        #raise ValueError(f"k must be equal to or one unit below len(clusters)={len(clusters)}")
 
     return is_k_clusters, sizes
 

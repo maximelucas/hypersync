@@ -23,6 +23,68 @@ __all__ = [
 ]
 
 
+def rhs_23_sym(t, psi, omega, k1, k2, links, triangles):
+    """
+    ODE RHS for coupled oscillators on any hypergraph.
+
+    The coupling functions are:
+    * sin(Oj - Oi)
+    * sin(Oj + Ok - 2 Oi)
+
+    Parameters
+    ----------
+    t : float
+        Time (does not affect the result, there for consistency with integrators).
+    theta : numpy ndarray
+        Phases of the oscillators at time t.
+    omega : float or array of floats
+        Frequencies of the oscillators.
+    k1 : float
+        Pairwise coupling strength
+    k2 : float
+        Triadic coupling strength
+    links : list of tuples
+        List of pairwise edges, in the form of list/tuple/set
+        of two elements.
+    triangles : list of tuples
+        List of triadic edges, in the form of list/tuple/set
+        of three elements.
+
+    Returns
+    -------
+    array
+        Amount to add to the phases to update them after one integration step.
+
+    """
+
+    N = len(psi)
+    pairwise = np.zeros(N)
+    triplet = np.zeros(N)
+    for i, j in links:
+        # sin(oj - oi)
+        oi = psi[i]
+        oj = psi[j]
+        pairwise[i] += sin(oj - oi)
+        pairwise[j] += sin(oi - oj)
+
+    for i, j, k in triangles:
+        # sin(2 oj - ok - oi)
+        oi = psi[i]
+        oj = psi[j]
+        ok = psi[k]
+        triplet[i] += 2 * sin(oj + ok - 2 * oi)
+        triplet[j] += 2 * sin(oi + ok - 2 * oj)
+        triplet[k] += 2 * sin(oj + oi - 2 * ok)
+
+    k1_avg = len(links) / N * 2
+    k2_avg = len(triangles) / N * 3
+    g1 = (k1 / k1_avg) if k1_avg!=0 else 0
+    g2 = (k2 / (k2_avg * 2)) if k2_avg!=0 else 0
+
+    return omega + g1 * pairwise + g2 * triplet 
+
+
+
 def rhs_pairwise_a2a(t, psi, omega, k1):
     """Right-hand side of the ODE, all-to-all pairwise coupling.
 

@@ -52,10 +52,11 @@ hs.plot_summary(thetas, times, H)
 
 plt.show()
 ```
+<img src="https://github.com/user-attachments/assets/a6c40630-b960-416d-bfd8-dd4e02c10e80" width="65%">
 
 ## Credits
 
-HyperSync is makes use of XGI for higher-order interactions and Scipy's solve_ivp() for ODE integration.
+hypersync is makes use of XGI for higher-order interactions and Scipy's solve_ivp() for ODE integration.
 
 Released under the 3-Clause BSD license.
 

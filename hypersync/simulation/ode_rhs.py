@@ -1,12 +1,11 @@
 """
-Righ-hand-side functions of ODEs for simulating synchronisation 
-of oscillators with group interactions
+Right-hand-side functions of ODEs for simulating synchronisation
+of oscillators with group interactions.
 """
 
 from math import sin
 
 import numpy as np
-import xgi
 from numba import jit
 
 __all__ = [
@@ -14,7 +13,7 @@ __all__ = [
     "rhs_pairwise_a2a",
     "rhs_pairwise_meso",
     "rhs_pairwise_adj",
-    "rhs_pairwise_a2a_harmonic", 
+    "rhs_pairwise_a2a_harmonic",
     "rhs_triplet_sym_meso",
     "rhs_triplet_asym_meso",
     "rhs_23_sym_nb",
@@ -24,277 +23,267 @@ __all__ = [
 ]
 
 
-def rhs_23_sym(t, psi, omega, k1, k2, links, triangles):
+def rhs_23_sym(t, theta, omega, k1, k2, links, triangles):
     """
-    Right-hand side of the ODE, for any hypergraphs with links and triangles.
+    Right-hand side of the ODE for any hypergraph with links and triangles.
 
-    The coupling functions are:
-    * sin(Oj - Oi)
-    * sin(Oj + Ok - 2 Oi)
+    Coupling functions: sin(theta_j - theta_i) and sin(theta_j + theta_k - 2*theta_i).
+    Normalised by mean pairwise degree and mean triadic degree.
 
     Parameters
     ----------
     t : float
-        Time (does not affect the result, there for consistency with integrators).
-    theta : numpy ndarray
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
         Phases of the oscillators at time t.
-    omega : float or array of floats
-        Frequencies of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Pairwise coupling strength
+        Pairwise coupling strength.
     k2 : float
-        Triadic coupling strength
+        Triadic coupling strength.
     links : list of tuples
-        List of pairwise edges, in the form of list/tuple/set
-        of two elements.
+        Pairwise edges, each as a tuple/list/set of two node indices.
     triangles : list of tuples
-        List of triadic edges, in the form of list/tuple/set
-        of three elements.
+        Triadic edges, each as a tuple/list/set of three node indices.
 
     Returns
     -------
-    array
-        Amount to add to the phases to update them after one integration step.
-
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
     """
-
-    N = len(psi)
+    N = len(theta)
     pairwise = np.zeros(N)
     triplet = np.zeros(N)
+
     for i, j in links:
         # sin(oj - oi)
-        oi = psi[i]
-        oj = psi[j]
+        oi = theta[i]
+        oj = theta[j]
         pairwise[i] += sin(oj - oi)
         pairwise[j] += sin(oi - oj)
 
     for i, j, k in triangles:
-        # sin(2 oj - ok - oi)
-        oi = psi[i]
-        oj = psi[j]
-        ok = psi[k]
+        # sin(oj + ok - 2*oi)
+        oi = theta[i]
+        oj = theta[j]
+        ok = theta[k]
         triplet[i] += 2 * sin(oj + ok - 2 * oi)
         triplet[j] += 2 * sin(oi + ok - 2 * oj)
         triplet[k] += 2 * sin(oj + oi - 2 * ok)
 
     k1_avg = len(links) / N * 2
     k2_avg = len(triangles) / N * 3
-    g1 = (k1 / k1_avg) if k1_avg!=0 else 0
-    g2 = (k2 / (k2_avg * 2)) if k2_avg!=0 else 0
+    g1 = (k1 / k1_avg) if k1_avg != 0 else 0
+    g2 = (k2 / (k2_avg * 2)) if k2_avg != 0 else 0
 
-    return omega + g1 * pairwise + g2 * triplet 
+    return omega + g1 * pairwise + g2 * triplet
 
 
+def rhs_pairwise_a2a(t, theta, omega, k1):
+    """
+    Right-hand side of the ODE, all-to-all pairwise coupling.
 
-def rhs_pairwise_a2a(t, psi, omega, k1):
-    """Right-hand side of the ODE, all-to-all pairwise coupling.
-
-    Coupling function: sin(oj - oi). This is the original Kuramoto
-    model. This version uses an optimisation avoiding matrix products.
+    Coupling function: sin(theta_j - theta_i). This is the original Kuramoto
+    model. Uses a vectorised implementation that avoids explicit matrix products.
 
     Parameters
     ----------
-    t: float
-        Time
-    psi: array of float
-        Phases to integrate
-    omega : float or array of floats
-        Natural frequencies of the oscillators
+    t : float
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
+        Phases of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Coupling strength
+        Coupling strength.
 
     Returns
     -------
-    array of floats of length N
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
 
-    See also
+    See Also
     --------
-    rhs_pairwise_meso
-    rhs_pairwise_adj
+    rhs_pairwise_meso, rhs_pairwise_adj
     """
+    N = len(theta)
+    sin_theta = np.sin(theta)
+    cos_theta = np.cos(theta)
 
-    N = len(psi)
-    sin_psi = np.sin(psi)
-    cos_psi = np.cos(psi)
-
-    sum_cos_psi = np.sum(cos_psi)
-    sum_sin_psi = np.sum(sin_psi)
+    sum_cos = np.sum(cos_theta)
+    sum_sin = np.sum(sin_theta)
 
     # oj - oi
-    pairwise = -sum_cos_psi * sin_psi + sum_sin_psi * cos_psi
+    pairwise = -sum_cos * sin_theta + sum_sin * cos_theta
 
     return omega + (k1 / N) * pairwise
 
 
-def rhs_pairwise_meso(t, psi, omega, k1, links):
-    """Right-hand side of the ODE, only pairwise coupling.
+def rhs_pairwise_meso(t, theta, omega, k1, links):
+    """
+    Right-hand side of the ODE, pairwise coupling on an arbitrary network.
 
-    Coupling function: sin(oj - oi). This is the usual Kuramoto
-    model on complex networks. This version of the function loops
-    over links.
+    Coupling function: sin(theta_j - theta_i). Loops over links.
 
     Parameters
     ----------
-    t: float
-        Time
-    psi: array of float
-        Phases to integrate
-    omega : float or array of floats
-        Natural frequencies of the oscillators
+    t : float
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
+        Phases of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Coupling strength
+        Coupling strength.
     links : list of tuples
-        List of pairwise links, in the form of list/tuple/set
-        of two elements.
+        Pairwise edges, each as a tuple/list/set of two node indices.
 
     Returns
     -------
-    array of floats of length N
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
 
-    See also
+    See Also
     --------
     rhs_pairwise_adj
-
     """
-
-    N = len(psi)
+    N = len(theta)
     pairwise = np.zeros(N)
 
     for i, j in links:
         # sin(oj - oi)
-        oi = psi[i]
-        oj = psi[j]
+        oi = theta[i]
+        oj = theta[j]
         pairwise[i] += sin(oj - oi)
         pairwise[j] += sin(oi - oj)
 
     return omega + (k1 / N) * pairwise
 
 
-def rhs_pairwise_adj(t, psi, omega, k1, adj1):
-    """Right-hand side of the ODE, only pairwise coupling.
+def rhs_pairwise_adj(t, theta, omega, k1, adj1):
+    """
+    Right-hand side of the ODE, pairwise coupling on an arbitrary network.
 
-    Coupling function: sin(oj - oi). This is the usual Kuramoto
-    model on complex networks. This version of the function uses
-    matrix multiplication.
+    Coupling function: sin(theta_j - theta_i). Uses matrix multiplication.
 
     Parameters
     ----------
-    t: float
-        Time
-    psi: array of float
-        Phases to integrate
-    omega : float or array of floats
-        Natural frequencies of the oscillators
+    t : float
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
+        Phases of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Coupling strength
-    adj1 : ndarray
-        Adjacency matrix (of order 1) of shape (N, N).
+        Coupling strength.
+    adj1 : numpy.ndarray of shape (N, N)
+        Adjacency matrix of order 1.
 
     Returns
     -------
-    array of floats of length N
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
 
-    See also
+    See Also
     --------
-    rhs_pairwise_adj
+    rhs_pairwise_meso
     """
+    N = len(theta)
+    sin_theta = np.sin(theta)
+    cos_theta = np.cos(theta)
 
-    N = len(psi)
-    sin_psi = np.sin(psi)
-    cos_psi = np.cos(psi)
-
-    pairwise = adj1.dot(sin_psi) * cos_psi - adj1.dot(cos_psi) * sin_psi
+    # oj - oi
+    pairwise = adj1.dot(sin_theta) * cos_theta - adj1.dot(cos_theta) * sin_theta
 
     return omega + (k1 / N) * pairwise
 
 
-def rhs_pairwise_a2a_harmonic(t, psi, omega, k1, k2):
-    """Right-hand side of the ODE, all-to-all pairwise coupling.
+def rhs_pairwise_a2a_harmonic(t, theta, omega, k1, k2):
+    """
+    Right-hand side of the ODE, all-to-all pairwise coupling with a harmonic.
 
-    Coupling function: k1 * sin(oj - oi) + k2 * sin(2 oj - 2 oi). 
-    This is the original Kuramoto model with a harmonic added. 
-    This version uses an optimisation avoiding matrix products.
+    Coupling function: k1*sin(theta_j - theta_i) + k2*sin(2*theta_j - 2*theta_i).
+    Uses a vectorised implementation that avoids explicit matrix products.
 
     Parameters
     ----------
-    t: float
-        Time
-    psi: array of float
-        Phases to integrate
-    omega : float or array of floats
-        Natural frequencies of the oscillators
+    t : float
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
+        Phases of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Coupling strength of the 
+        Coupling strength of the first harmonic.
     k2 : float
+        Coupling strength of the second harmonic.
 
     Returns
     -------
-    array of floats of length N
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
 
-    See also
+    See Also
     --------
-    rhs_pairwise_meso
-    rhs_pairwise_adj
+    rhs_pairwise_a2a
     """
+    N = len(theta)
+    sin_theta = np.sin(theta)
+    cos_theta = np.cos(theta)
 
-    N = len(psi)
-    sin_psi = np.sin(psi)
-    cos_psi = np.cos(psi)
-
-    sum_cos_psi = np.sum(cos_psi)
-    sum_sin_psi = np.sum(sin_psi)
+    sum_cos = np.sum(cos_theta)
+    sum_sin = np.sum(sin_theta)
 
     # oj - oi
-    pairwise = -sum_cos_psi * sin_psi + sum_sin_psi * cos_psi
+    pairwise = -sum_cos * sin_theta + sum_sin * cos_theta
 
-    sum_cos_psi_sq = np.sum(cos_psi**2)
-    sum_sin_psi_sq = np.sum(sin_psi**2)
+    sum_cos_sq = np.sum(cos_theta**2)
+    sum_sin_sq = np.sum(sin_theta**2)
 
     # 2oj - 2oi
     pairwise_harmonic = 2 * (
-        -cos_psi * sin_psi * sum_cos_psi_sq
-        + cos_psi**2 * np.sum(cos_psi * sin_psi)
-        - sin_psi**2 * np.sum(cos_psi * sin_psi)
-        + cos_psi * sin_psi * sum_sin_psi_sq
+        -cos_theta * sin_theta * sum_cos_sq
+        + cos_theta**2 * np.sum(cos_theta * sin_theta)
+        - sin_theta**2 * np.sum(cos_theta * sin_theta)
+        + cos_theta * sin_theta * sum_sin_sq
     )
 
     return omega + (k1 / N) * pairwise + (k2 / N) * pairwise_harmonic
 
 
-def rhs_triplet_sym_meso(t, psi, omega, k2, triangles):
-    """Right-hand side of the ODE, only triadic coupling.
+def rhs_triplet_sym_meso(t, theta, omega, k2, triangles):
+    """
+    Right-hand side of the ODE, symmetric triadic coupling on an arbitrary network.
 
-    Coupling function: sin(oj + ok - 2oi). This version of the function loops
-    over triangles.
+    Coupling function: sin(theta_j + theta_k - 2*theta_i). Loops over triangles.
 
     Parameters
     ----------
-    t: float
-        Time
-    psi: array of float
-        Phases to integrate
-    omega : float or array of floats
-        Natural frequencies of the oscillators
+    t : float
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
+        Phases of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k2 : float
-        Coupling strength
+        Triadic coupling strength.
     triangles : list of tuples
-        List of triadic edges, in the form of list/tuple/set
-        of three elements.
+        Triadic edges, each as a tuple/list/set of three node indices.
 
     Returns
     -------
-    array of floats of length N
-
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
     """
-
-    N = len(psi)
+    N = len(theta)
     triplet = np.zeros(N)
 
     for i, j, k in triangles:
-        # sin(oj - ok - 2 oi)
-        oi = psi[i]
-        oj = psi[j]
-        ok = psi[k]
+        # sin(oj + ok - 2*oi)
+        oi = theta[i]
+        oj = theta[j]
+        ok = theta[k]
         triplet[i] += 2 * sin(oj + ok - 2 * oi)
         triplet[j] += 2 * sin(oi + ok - 2 * oj)
         triplet[k] += 2 * sin(oj + oi - 2 * ok)
@@ -302,40 +291,38 @@ def rhs_triplet_sym_meso(t, psi, omega, k2, triangles):
     return omega + (k2 / N**2) * triplet
 
 
-def rhs_triplet_asym_meso(t, psi, omega, k2, triangles):
-    """Right-hand side of the ODE, only triadic coupling.
+def rhs_triplet_asym_meso(t, theta, omega, k2, triangles):
+    """
+    Right-hand side of the ODE, asymmetric triadic coupling on an arbitrary network.
 
-    Coupling function: sin(2oj - ok + 2oi). This version of the function loops
-    over triangles.
+    Coupling function: sin(2*theta_j - theta_k - theta_i). Loops over triangles.
 
     Parameters
     ----------
-    t: float
-        Time
-    psi: array of float
-        Phases to integrate
-    omega : float or array of floats
-        Natural frequencies of the oscillators
+    t : float
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
+        Phases of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k2 : float
-        Coupling strength
+        Triadic coupling strength.
     triangles : list of tuples
-        List of triadic edges, in the form of list/tuple/set
-        of three elements.
+        Triadic edges, each as a tuple/list/set of three node indices.
 
     Returns
     -------
-    array of floats of length N
-
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
     """
-
-    N = len(psi)
+    N = len(theta)
     triplet = np.zeros(N)
 
     for i, j, k in triangles:
-        # sin(oj - ok - 2 oi)
-        oi = psi[i]
-        oj = psi[j]
-        ok = psi[k]
+        # sin(2*oj - ok - oi)
+        oi = theta[i]
+        oj = theta[j]
+        ok = theta[k]
         triplet[i] += sin(2 * oj - ok - oi) + sin(2 * ok - oj - oi)
         triplet[j] += sin(2 * ok - oi - oj) + sin(2 * oi - ok - oj)
         triplet[k] += sin(2 * oi - oj - ok) + sin(2 * oj - oi - ok)
@@ -348,46 +335,40 @@ def rhs_23_sym_nb(t, theta, omega, k1, k2):
     """
     ODE RHS for coupled oscillators on a complete network.
 
-    The coupling range is r, and interactions are pairwise and triadic.
-    The coupling functions are:
-    * sin(oj - oi)
-    * sin(oj + ok - 2oi)
+    Coupling functions: sin(theta_j - theta_i) and sin(theta_j + theta_k - 2*theta_i).
 
     Parameters
     ----------
     t : float
-        Time (does not affect the result, there for consistency with integrators).
-    theta : numpy ndarray
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
         Phases of the oscillators at time t.
-    omega : float or array of floats
-        Frequencies of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Pairwise coupling strength
+        Pairwise coupling strength.
     k2 : float
-        Triadic coupling strength
+        Triadic coupling strength.
 
     Returns
     -------
-    array
-        Amount to add to the phases to update them after one integration step.
-
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
     """
-
     N = len(theta)
 
     pairwise = np.zeros(N)
     triplets = np.zeros(N)
 
     for ii in range(N):
-        for jj in range(N):  # pairwise
+        for jj in range(N):
             jjj = (ii + jj) % N
             pairwise[ii] += sin(theta[jjj] - theta[ii])
 
             for kk in range(N):
-                if jj < kk:  # because coupling function is symmetric in j and k
+                if jj < kk:
                     jjj = (ii + jj) % N
                     kkk = (ii + kk) % N
-                    # x2 to count triangles in both directions
                     triplets[ii] += 2 * sin(theta[kkk] + theta[jjj] - 2 * theta[ii])
 
     return omega + (k1 / N) * pairwise + k2 / (N**2) * triplets
@@ -398,44 +379,38 @@ def rhs_23_asym_nb(t, theta, omega, k1, k2):
     """
     ODE RHS for coupled oscillators on a complete network.
 
-    The coupling range is r, and interactions are pairwise and triadic.
-    The coupling functions are:
-    * sin(oj - oi)
-    * sin(2oj - ok - oi)
+    Coupling functions: sin(theta_j - theta_i) and sin(2*theta_j - theta_k - theta_i).
 
     Parameters
     ----------
     t : float
-        Time (does not affect the result, there for consistency with integrators).
-    theta : numpy ndarray
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
         Phases of the oscillators at time t.
-    omega : float or array of floats
-        Frequencies of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Pairwise coupling strength
+        Pairwise coupling strength.
     k2 : float
-        Triadic coupling strength
+        Triadic coupling strength.
 
     Returns
     -------
-    array
-        Amount to add to the phases to update them after one integration step.
-
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
     """
-
     N = len(theta)
 
     pairwise = np.zeros(N)
     triplets = np.zeros(N)
 
     for ii in range(N):
-        for jj in range(N):  # pairwise
+        for jj in range(N):
             jjj = (ii + jj) % N
             pairwise[ii] += sin(theta[jjj] - theta[ii])
 
             for kk in range(N):
-
-                if jj==kk or ii==kk or ii==jj:
+                if jj == kk or ii == kk or ii == jj:
                     continue
 
                 jjj = (ii + jj) % N
@@ -450,33 +425,28 @@ def rhs_ring_23_sym_nb(t, theta, omega, k1, k2, r):
     """
     ODE RHS for coupled oscillators on a ring network.
 
-    The coupling range is r, and interactions are pairwise and triadic.
-    The coupling functions are:
-    * sin(Oj - Oi)
-    * sin(Oj + Ok - 2 Oi)
+    Coupling functions: sin(theta_j - theta_i) and sin(theta_j + theta_k - 2*theta_i).
 
     Parameters
     ----------
     t : float
-        Time (does not affect the result, there for consistency with integrators).
-    theta : numpy ndarray
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
         Phases of the oscillators at time t.
-    omega : float or array of floats
-        Frequencies of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Pairwise coupling strength
+        Pairwise coupling strength.
     k2 : float
-        Triadic coupling strength
+        Triadic coupling strength.
     r : int
-        Pairwise and triplet nearest neighbour ranges
+        Pairwise and triplet nearest-neighbour range.
 
     Returns
     -------
-    array
-        Amount to add to the phases to update them after one integration step.
-
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
     """
-
     N = len(theta)
 
     pairwise = np.zeros(N)
@@ -486,16 +456,15 @@ def rhs_ring_23_sym_nb(t, theta, omega, k1, k2, r):
     idx_1 = range(-r, r + 1)
 
     for ii in range(N):
-        for jj in idx_1:  # pairwise
+        for jj in idx_1:
             jjj = (ii + jj) % N
             pairwise[ii] += sin(theta[jjj] - theta[ii])
 
-        for jj in idx_2:  # triplet
+        for jj in idx_2:
             for kk in idx_2:
-                if jj < kk:  # because coupling function is symmetric in j and k
+                if jj < kk:
                     jjj = (ii + jj) % N
                     kkk = (ii + kk) % N
-                    # x2 to count triangles in both directions
                     triplets[ii] += 2 * sin(theta[kkk] + theta[jjj] - 2 * theta[ii])
 
     return omega + (k1 / r) * pairwise + k2 / (r * (2 * r - 1)) * triplets
@@ -506,33 +475,28 @@ def rhs_ring_23_asym_nb(t, theta, omega, k1, k2, r):
     """
     ODE RHS for coupled oscillators on a ring network.
 
-    The coupling range is r, and interactions are pairwise and triadic.
-    The coupling functions are:
-    * sin(Oj - Oi)
-    * sin(Oj + Ok - 2 Oi)
+    Coupling functions: sin(theta_j - theta_i) and sin(2*theta_j - theta_k - theta_i).
 
     Parameters
     ----------
     t : float
-        Time (does not affect the result, there for consistency with integrators).
-    theta : numpy ndarray
+        Time (unused, present for compatibility with integrators).
+    theta : numpy.ndarray
         Phases of the oscillators at time t.
-    omega : float or array of floats
-        Frequencies of the oscillators.
+    omega : float or numpy.ndarray
+        Natural frequencies of the oscillators.
     k1 : float
-        Pairwise coupling strength
+        Pairwise coupling strength.
     k2 : float
-        Triadic coupling strength
+        Triadic coupling strength.
     r : int
-        Pairwise and triplet nearest neighbour ranges
+        Pairwise and triplet nearest-neighbour range.
 
     Returns
     -------
-    array
-        Amount to add to the phases to update them after one integration step.
-
+    dtheta : numpy.ndarray of shape (N,)
+        Rate of change of phases.
     """
-
     N = len(theta)
 
     pairwise = np.zeros(N)
@@ -542,11 +506,11 @@ def rhs_ring_23_asym_nb(t, theta, omega, k1, k2, r):
     idx_1 = range(-r, r + 1)
 
     for ii in range(N):
-        for jj in idx_1:  # pairwise
+        for jj in idx_1:
             jjj = (ii + jj) % N
             pairwise[ii] += sin(theta[jjj] - theta[ii])
 
-        for jj in idx_2:  # triplet
+        for jj in idx_2:
             for kk in idx_2:
                 if jj != kk:
                     jjj = (ii + jj) % N
@@ -554,4 +518,3 @@ def rhs_ring_23_asym_nb(t, theta, omega, k1, k2, r):
                     triplets[ii] += sin(-theta[kkk] + 2 * theta[jjj] - theta[ii])
 
     return omega + (k1 / r) * pairwise + k2 / (r * (2 * r - 1)) * triplets
-

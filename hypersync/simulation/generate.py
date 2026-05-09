@@ -28,14 +28,14 @@ def generate_q_twisted_state(N, q, noise=1e-2, seed=None):
 
     Returns
     -------
-    psi_init : numpy.ndarray of shape (N,)
+    theta : numpy.ndarray of shape (N,)
         Array of generated phase angles representing the initial state.
     """
     rng = np.random.default_rng(seed)
     rand_phase = rng.random() * 2 * np.pi
     perturbation = noise * rng.standard_normal(N)
-    psi_init = 2 * np.pi * q * np.arange(1, N + 1) / N + rand_phase + perturbation
-    return psi_init
+    theta = 2 * np.pi * q * np.arange(1, N + 1) / N + rand_phase + perturbation
+    return theta
 
 
 def generate_k_clusters(N, k, ps, noise=1e-2, seed=None):
@@ -58,7 +58,7 @@ def generate_k_clusters(N, k, ps, noise=1e-2, seed=None):
 
     Returns
     -------
-    psi_init : numpy.ndarray of shape (N,)
+    theta : numpy.ndarray of shape (N,)
         Array of generated phase angles representing the initial state.
 
     Raises
@@ -78,8 +78,8 @@ def generate_k_clusters(N, k, ps, noise=1e-2, seed=None):
     rand_phase = rng.random() * 2 * np.pi
     perturbation = noise * rng.standard_normal(N)
     choices = rand_phase + np.linspace(0, 2 * np.pi, num=k, endpoint=False)
-    psi_init = rng.choice(choices, size=N, p=ps) + perturbation
-    return psi_init
+    theta = rng.choice(choices, size=N, p=ps) + perturbation
+    return theta
 
 
 def generate_state(N, kind="random", noise=1e-2, seed=None, **kwargs):
@@ -108,7 +108,7 @@ def generate_state(N, kind="random", noise=1e-2, seed=None, **kwargs):
 
     Returns
     -------
-    psi_init : numpy.ndarray of shape (N,)
+    theta : numpy.ndarray of shape (N,)
         Initial phases for each oscillator.
 
     Raises
@@ -121,19 +121,19 @@ def generate_state(N, kind="random", noise=1e-2, seed=None, **kwargs):
     if kind == "sync":
         rand_phase = rng.random() * 2 * np.pi
         perturbation = noise * rng.standard_normal(N)
-        psi_init = rand_phase * np.ones(N) + perturbation
+        theta = rand_phase * np.ones(N) + perturbation
     elif kind == "random":
-        psi_init = rng.random(N) * 2 * np.pi
+        theta = rng.random(N) * 2 * np.pi
     elif kind == "splay":
         perturbation = noise * rng.standard_normal(N)
-        psi_init = np.linspace(0, 2 * np.pi, num=N, endpoint=False) + perturbation
+        theta = np.linspace(0, 2 * np.pi, num=N, endpoint=False) + perturbation
     elif kind == "k-cluster":
-        psi_init = generate_k_clusters(N, **kwargs, noise=noise, seed=rng)
+        theta = generate_k_clusters(N, **kwargs, noise=noise, seed=rng)
     elif kind == "q-twisted":
-        psi_init = generate_q_twisted_state(N, **kwargs, noise=noise, seed=rng)
+        theta = generate_q_twisted_state(N, **kwargs, noise=noise, seed=rng)
     else:
         raise ValueError(
             "Unknown kind. Must be one of 'sync', 'random', 'splay', 'k-cluster', 'q-twisted'."
         )
 
-    return psi_init
+    return theta

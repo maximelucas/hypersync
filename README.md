@@ -1,7 +1,14 @@
 # hypersynchronization
 
+[![PyPI version](https://img.shields.io/pypi/v/hypersynchronization)](https://pypi.org/project/hypersynchronization/)
+
 hypersynchronization is a Python library for the simulation, analysis, and visualization of oscillators with group (higher-order) interactions.
 
+## Installation
+
+```bash
+pip install hypersynchronization
+```
 
 ## Getting started
 

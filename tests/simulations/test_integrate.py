@@ -52,19 +52,7 @@ def test_simulate_kuramoto():
 
     n_t = len(times_out)
 
-    assert n_t == t_end / dt + 1  # find case where it's smaller
-    assert thetas_out.shape == (N, n_t)
-
-    # t_eval
-    t_end = 100
-    dt = 0.1
-    thetas_out, times_out = hs.simulate_kuramoto(
-        H, integrator="RK45", args=args, t_eval=True, t_end=t_end, dt=dt
-    )
-
-    n_t = len(times_out)
-
-    assert n_t == t_end / dt + 1  # find case where it's smaller
+    assert n_t == t_end / dt + 1
     assert thetas_out.shape == (N, n_t)
 
     # errors

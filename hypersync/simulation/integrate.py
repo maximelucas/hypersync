@@ -1,6 +1,5 @@
 """
-Functions to simulate the synchronisation 
-of oscillators with group interactions
+Functions to simulate the synchronisation of oscillators with group interactions.
 """
 
 import numpy as np
@@ -22,65 +21,67 @@ def simulate_kuramoto(
     dt=0.01,
     rhs=None,
     integrator="explicit_euler",
-    args=None,
-    t_eval=False,
-    **options
+    args=(),
+    seed=None,
+    **options,
 ):
     """
-    Simulate the Kuramoto model on a hypergraph with links and triangles.
+    Simulate the Kuramoto model on a hypergraph.
 
     Parameters
     ----------
-    H : Hypergraph
-        Hypergraph on which to simulate coupled oscillators
+    H : xgi.Hypergraph
+        Hypergraph on which to simulate coupled oscillators.
     omega : float or array-like, optional
-        Natural frequencies of each node. If None (default), a random normal distribution
-        with mean 0 and standard deviation 1 is used.
+        Natural frequencies of each node. If None (default), drawn from a
+        standard normal distribution.
     theta_0 : array-like, optional
-        Initial phases of each node. If None (default), random phases are drawn uniformly
+        Initial phases of each node. If None (default), drawn uniformly
         on [0, 2pi[.
     t_end : float, optional
-        End time of the integration. (Default: 100)
+        End time of the integration. Default is 100.
     dt : float, optional
-        Time step for the simulation. (Default: 0.01)
-    rhs : function, optional
-        Function that defines the rhs of the ODE to integrate. Must output an np.ndarray
-        of length H.num_nodes. Its first three arguments should be `t`, `theta`, and `omega`.
-        Other arguments coming after those can be specified via `args`.(Default: rhs_ring_nb)
+        Time step for output. Default is 0.01.
+    rhs : callable, optional
+        Right-hand side of the ODE. Must return a numpy.ndarray of length N.
+        Its first three arguments must be `t`, `theta`, and `omega`; extra
+        arguments are passed via `args`. Default is `rhs_23_sym_nb`.
     integrator : str, optional
-        Integration method to use. Either "explicit_euler" (default) or any method supported by
-        scipy.integrate.solve_ivp.
-    args : tuple
-        Arguments to pass to the `rhs` function, in order (other that `t`, `theta`, and `omega`).
-        (Default: None, which raises an error).
-    **options:
-        Additional keyword arguments to be passed to scipy's solve_ivp in case `integrator`
-        is not "explicit_euler".
+        Integration method. Either "explicit_euler" (default) or any method
+        accepted by scipy.integrate.solve_ivp.
+    args : tuple, optional
+        Extra arguments passed to `rhs` after `t`, `theta`, and `omega`.
+        Default is ().
+    seed : int, numpy.random.Generator, or None, optional
+        Seed for generating `omega` and `theta_0` when they are not provided.
+        Default is None.
+    **options
+        Additional keyword arguments passed to scipy.integrate.solve_ivp when
+        `integrator` is not "explicit_euler".
 
     Returns
     -------
-    thetas : array-like
+    thetas : numpy.ndarray of shape (N, n_t)
         Phases of each node at each time step.
-    times : array-like
-        Time points for each time step.
+    times : numpy.ndarray of shape (n_t,)
+        Time points corresponding to each column of `thetas`.
     """
+    rng = np.random.default_rng(seed)
 
     H = xgi.convert_labels_to_integers(H, "label")
     N = H.num_nodes
 
     if omega is None:
-        omega = np.random.normal(0, 1, N)
+        omega = rng.standard_normal(N)
 
     if theta_0 is None:
-        theta_0 = np.random.random(N) * 2 * np.pi
+        theta_0 = rng.random(N) * 2 * np.pi
 
     if rhs is None:
         rhs = rhs_23_sym_nb
 
     times = np.arange(0, t_end + dt / 2, dt)
     n_t = len(times)
-
-    t_eval = None if not t_eval else times
 
     thetas = np.zeros((N, n_t))
     thetas[:, 0] = theta_0
@@ -98,7 +99,7 @@ def simulate_kuramoto(
             t_eval=times,
             method=integrator,
             args=(omega, *args),
-            **options
+            **options,
         )
 
         thetas = solution.y

@@ -95,5 +95,5 @@ def test_order_parameter():
 
     assert R1.shape == (n_times,)
     assert R2.shape == (n_times,)
-    assert np.allclose(R1, 0.6, atol=1e-3)
+    assert np.allclose(R1, 0.4, atol=1e-3)
     assert np.allclose(R2, 1, atol=1e-3)

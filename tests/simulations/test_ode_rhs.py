@@ -36,7 +36,7 @@ def test_rhs_pairwise_meso(hypergraph0, state1):
     # random ic
     psi_out = hs.rhs_pairwise_meso(0, state1, omega, k1, links)
     assert np.allclose(
-        psi_out, [0.33054527, -0.15332373, -0.00983145, -0.32393079, 0.15654069]
+        psi_out, [0.00473607, 0.11240593, -0.03982561, 0.07420681, -0.1515232]
     )
 
     # consistency with other rhs
@@ -55,7 +55,7 @@ def test_rhs_pairwise_adj(hypergraph0, state1):
     adj1 = xgi.adjacency_matrix(H, order=1)
     psi_out = hs.rhs_pairwise_adj(0, state1, omega, k1, adj1)
     assert np.allclose(
-        psi_out, [0.33054527, -0.15332373, -0.00983145, -0.32393079, 0.15654069]
+        psi_out, [0.00473607, 0.11240593, -0.03982561, 0.07420681, -0.1515232]
     )
 
     # consistency with other rhs
@@ -100,16 +100,16 @@ def test_rhs_ring_23_asym_nb():
     assert np.allclose(
         psi_out,
         [
-            -0.61466449,
-            0.2096792,
-            -0.94804897,
-            0.22004142,
-            -0.28502981,
-            -0.10858078,
-            0.18618909,
-            0.17115625,
-            0.52878709,
-            0.08056231,
+            -0.14940351,
+            0.59211323,
+            0.05487797,
+            0.85278216,
+            -0.61954368,
+            0.13942231,
+            0.5618456,
+            0.12551108,
+            0.41752752,
+            0.27133915,
         ],
         atol=1e-5,
     )

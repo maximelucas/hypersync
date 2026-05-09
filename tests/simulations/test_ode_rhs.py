@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 import xgi
 
 import hypersync as hs
@@ -37,14 +36,18 @@ def test_rhs_23_sym(hypergraph0, state1):
     assert np.allclose(psi_out_omega, psi_out + 2.5)
 
     # k1=0: pairwise term vanishes, only triplet remains
-    psi_k1 = hs.rhs_23_sym(0, state1, omega, k1=0, k2=1, links=links, triangles=triangles)
-    psi_k2 = hs.rhs_23_sym(0, state1, omega, k1=1, k2=0, links=links, triangles=triangles)
-    psi_both = hs.rhs_23_sym(0, state1, omega, k1=1, k2=1, links=links, triangles=triangles)
+    psi_k1 = hs.rhs_23_sym(
+        0, state1, omega, k1=0, k2=1, links=links, triangles=triangles
+    )
+    psi_k2 = hs.rhs_23_sym(
+        0, state1, omega, k1=1, k2=0, links=links, triangles=triangles
+    )
+    psi_both = hs.rhs_23_sym(
+        0, state1, omega, k1=1, k2=1, links=links, triangles=triangles
+    )
     assert np.allclose(psi_k1 + psi_k2, psi_both)
 
     # empty hypergraph: no coupling, returns omega
-    H_empty = xgi.Hypergraph()
-    H_empty.add_nodes_from(range(5))
     psi_out = hs.rhs_23_sym(0, state1, omega, k1, k2, links=[], triangles=[])
     assert np.allclose(psi_out, omega)
 

@@ -267,7 +267,9 @@ def plot_summary(thetas, times, H):
 
     N, n_t = thetas.shape
 
-    fig, axs = plt.subplots(2, 3, figsize=(5, 2), width_ratios=[2.5, 1, 1], sharex="col")
+    fig, axs = plt.subplots(
+        2, 3, figsize=(5, 2), width_ratios=[2.5, 1, 1], sharex="col"
+    )
 
     plot_series(thetas, times, ax=axs[0, 0], n=N)
 
@@ -281,9 +283,7 @@ def plot_summary(thetas, times, H):
     axs[0, 1].set_title(f"$t={times[0]}$s", fontsize="x-small")
     axs[1, 1].set_title(f"$t={times[-1]}$s", fontsize="x-small")
 
-    plot_phases_ring(
-        H, thetas[:, 0], ax=axs[0, 2], node_size=5, alpha=0.8, node_lw=0.1
-    )
+    plot_phases_ring(H, thetas[:, 0], ax=axs[0, 2], node_size=5, alpha=0.8, node_lw=0.1)
     plot_phases_ring(
         H, thetas[:, -1], ax=axs[1, 2], node_size=5, alpha=0.8, node_lw=0.1
     )
@@ -300,7 +300,7 @@ def plot_summary(thetas, times, H):
     axins.set_xlabel("")
     axins.set_yticks([])
     axins.set_xticks([])
-    axins.patch.set_alpha(0.5) # make inset transparent
+    axins.patch.set_alpha(0.5)  # make inset transparent
 
     sb.despine(ax=axins)
 

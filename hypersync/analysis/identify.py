@@ -2,6 +2,8 @@
 Functions to identify states in coupled oscillators
 """
 
+import warnings
+
 import numpy as np
 from numpy.linalg import norm
 
@@ -54,14 +56,14 @@ def identify_state(thetas, atol=1e-3):
     except Exception as err:
         is_2clust = False
         sizes2 = []
-        print(err)
+        warnings.warn(str(err))
 
     try:
         is_3clust, sizes3 = identify_k_clusters(thetas, k=3, atol=1e-2)
     except Exception as err:
         is_3clust = False
         sizes3 = []
-        print(err)
+        warnings.warn(str(err))
 
     if is_twisted:
         return f"{q}-twisted"

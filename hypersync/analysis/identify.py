@@ -37,6 +37,18 @@ def identify_state(thetas, atol=1e-3):
         - "q-twisted" for q-twisted synchronization, where q is the winding number.
         - "splay" for splay synchronization.
         - "other" for other or unsynchronized states.
+
+    Notes
+    -----
+    A perfectly synchronised state (all phases equal) is returned as "0-twisted",
+    not "sync". The "sync" label is reserved for noisy near-synchronised states
+    where the order parameter R1 ≈ 1 but the phase differences are not exactly
+    uniform.
+
+    A splay state where phases increase monotonically with node index is
+    indistinguishable from a 1-twisted state and will be returned as "1-twisted".
+    The "splay" label is only returned when phases are evenly distributed on the
+    circle but not ordered by node index.
     """
 
     R1 = order_parameter(thetas, order=1)

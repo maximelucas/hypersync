@@ -19,23 +19,23 @@ def identify_state(thetas, atol=1e-3):
     """
     Identify the synchronization state.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     thetas : array-like, shape (n_phases,)
         Phases of the oscillators.
     atol : float, optional
         The absolute tolerance used for comparison with synchronization parameters.
         Default is 1e-3.
 
-    Returns:
-    --------
+    Returns
+    -------
     state : str
         A string representing the identified synchronization state:
-        - "sync" for complete synchronization.
-        - "2-cluster" for 2-cluster synchronization.
-        - "3-cluster" for 3-cluster synchronization.
         - "q-twisted" for q-twisted synchronization, where q is the winding number.
         - "splay" for splay synchronization.
+        - "sync" for near-synchronised states with R1 ≈ 1.
+        - "2-cluster" for 2-cluster synchronization.
+        - "3-cluster" for 3-cluster synchronization.
         - "other" for other or unsynchronized states.
 
     Notes
@@ -49,6 +49,25 @@ def identify_state(thetas, atol=1e-3):
     indistinguishable from a 1-twisted state and will be returned as "1-twisted".
     The "splay" label is only returned when phases are evenly distributed on the
     circle but not ordered by node index.
+
+    See Also
+    --------
+    identify_q_twisted : Detect a q-twisted state and compute its winding number.
+    identify_k_clusters : Detect a k-cluster state and return cluster sizes.
+    order_parameter : Compute the Daido order parameter.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import hypersync as hs
+    >>> hs.identify_state(np.zeros(10))
+    '0-twisted'
+    >>> theta = hs.generate_q_twisted_state(10, q=1, noise=0)
+    >>> hs.identify_state(theta)
+    '1-twisted'
+    >>> theta = np.array([0.0] * 5 + [np.pi] * 5)
+    >>> hs.identify_state(theta)
+    '2-cluster'
     """
 
     R1 = order_parameter(thetas, order=1)
@@ -97,22 +116,36 @@ def identify_k_clusters(thetas, k, atol=1e-2):
 
     A k-cluster state has k evenly spaced clusters on the circle.
 
-    Parameters:
-    -----------
-    thetas : array-like, shape (n_phases, )
+    Parameters
+    ----------
+    thetas : array-like, shape (n_phases,)
         Phases of the oscillators.
     k : int
-        Number of clusters
+        Number of clusters.
     atol : float, optional
         The absolute tolerance used for comparison with synchronization
         parameters. Default is 1e-2.
 
-    Returns:
-    --------
+    Returns
+    -------
     is_k_clusters : bool
         True if the state is a k-cluster. False otherwise.
-    sizes : tuple of float
+    sizes : list of float
         The relative sizes of each cluster.
+
+    See Also
+    --------
+    identify_state : Identify the overall synchronization state.
+    generate_k_clusters : Generate a k-cluster initial condition.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import hypersync as hs
+    >>> theta = np.array([0.0] * 5 + [np.pi] * 5)
+    >>> is_2clust, sizes = hs.identify_k_clusters(theta, k=2)
+    >>> is_2clust, sizes
+    (True, [0.5, 0.5])
     """
 
     n_clust = k
@@ -170,19 +203,35 @@ def identify_q_twisted(thetas, atol=1e-1):
     The winding number indicates how many times the phase
     angles wind around the unit circle.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     thetas : array-like, shape (n_phases,)
         Phases of the oscillators.
+    atol : float, optional
+        Tolerance for deciding whether phase differences are uniform enough
+        to be a twisted state. Default is 1e-1.
 
-    Returns:
-    --------
+    Returns
+    -------
     q : int
         The winding number, indicating how many times the phase
         angles wind around the unit circle.
     is_twisted_state : bool
         True if the phase differences are close to their mean,
         indicating a twisted state; False otherwise.
+
+    See Also
+    --------
+    identify_state : Identify the overall synchronization state.
+    generate_q_twisted_state : Generate a q-twisted initial condition.
+
+    Examples
+    --------
+    >>> import hypersync as hs
+    >>> theta = hs.generate_q_twisted_state(10, q=2, noise=0)
+    >>> q, is_twisted = hs.identify_q_twisted(theta)
+    >>> q, is_twisted
+    (2, True)
     """
     thetas = thetas % (2 * np.pi)  # ensure it's mod 2 pi
 
@@ -206,10 +255,10 @@ def order_parameter(thetas, order=1, complex=False, axis=0):
     The order parameter is a measure of how the phase angles are aligned.
     It can be used to quantify the level of synchronization or coherence in a system.
 
-    Parameters:
-    -----------
-    thetas : array-like, shape (n_oscillators, n_times)
-        Phases of the oscillators over time
+    Parameters
+    ----------
+    thetas : array-like, shape (n_oscillators,) or (n_oscillators, n_times)
+        Phases of the oscillators over time.
     order : int, optional
         The order of the order parameter. Default is 1.
     complex : bool, optional
@@ -219,11 +268,26 @@ def order_parameter(thetas, order=1, complex=False, axis=0):
         The axis of length n_oscillators, along which the sum of the phases
         is taken. Default is 0.
 
-    Returns:
-    --------
-    result : array-like
+    Returns
+    -------
+    result : float or numpy.ndarray
         If `complex` is True, the complex order parameter.
         If `complex` is False, the magnitude of the order parameter.
+
+    See Also
+    --------
+    identify_state : Identify the overall synchronization state.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import hypersync as hs
+    >>> theta = np.zeros(10)  # fully synchronized
+    >>> hs.order_parameter(theta)
+    1.0
+    >>> theta = np.linspace(0, 2 * np.pi, 10, endpoint=False)  # splay state
+    >>> np.isclose(hs.order_parameter(theta), 0)
+    True
     """
 
     N = len(thetas)

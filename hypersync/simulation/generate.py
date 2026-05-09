@@ -30,6 +30,21 @@ def generate_q_twisted_state(N, q, noise=1e-2, seed=None):
     -------
     theta : numpy.ndarray of shape (N,)
         Array of generated phase angles representing the initial state.
+
+    See Also
+    --------
+    generate_state : Unified interface for all initial-condition types.
+    identify_q_twisted : Identify a q-twisted state from phases.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import hypersync as hs
+    >>> theta = hs.generate_q_twisted_state(10, q=1, noise=0)
+    >>> theta.shape
+    (10,)
+    >>> np.allclose(np.diff(theta), 2 * np.pi / 10)
+    True
     """
     rng = np.random.default_rng(seed)
     rand_phase = rng.random() * 2 * np.pi
@@ -65,6 +80,18 @@ def generate_k_clusters(N, k, ps, noise=1e-2, seed=None):
     ------
     ValueError
         If `len(ps) != k` or if `ps` does not sum to 1.
+
+    See Also
+    --------
+    generate_state : Unified interface for all initial-condition types.
+    identify_k_clusters : Identify a k-cluster state from phases.
+
+    Examples
+    --------
+    >>> import hypersync as hs
+    >>> theta = hs.generate_k_clusters(10, k=2, ps=[0.5, 0.5], noise=0, seed=0)
+    >>> len(set(theta))
+    2
     """
     rng = np.random.default_rng(seed)
 
@@ -115,6 +142,22 @@ def generate_state(N, kind="random", noise=1e-2, seed=None, **kwargs):
     ------
     ValueError
         If `kind` is not one of the supported options.
+
+    See Also
+    --------
+    generate_k_clusters : Generate a k-cluster state directly.
+    generate_q_twisted_state : Generate a q-twisted state directly.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import hypersync as hs
+    >>> theta = hs.generate_state(10, kind="sync", noise=0, seed=0)
+    >>> float(np.std(theta))
+    0.0
+    >>> theta = hs.generate_state(10, kind="q-twisted", q=2, noise=0)
+    >>> hs.identify_state(theta)
+    '2-twisted'
     """
     rng = np.random.default_rng(seed)
 

@@ -39,7 +39,7 @@ def generate_q_twisted_state(N, q, noise=1e-2, seed=None):
     Examples
     --------
     >>> import numpy as np
-    >>> import hypersync as hs
+    >>> import hypersynchronization as hs
     >>> theta = hs.generate_q_twisted_state(10, q=1, noise=0)
     >>> theta.shape
     (10,)
@@ -88,7 +88,7 @@ def generate_k_clusters(N, k, ps, noise=1e-2, seed=None):
 
     Examples
     --------
-    >>> import hypersync as hs
+    >>> import hypersynchronization as hs
     >>> theta = hs.generate_k_clusters(10, k=2, ps=[0.5, 0.5], noise=0, seed=0)
     >>> len(set(theta))
     2
@@ -151,7 +151,7 @@ def generate_state(N, kind="random", noise=1e-2, seed=None, **kwargs):
     Examples
     --------
     >>> import numpy as np
-    >>> import hypersync as hs
+    >>> import hypersynchronization as hs
     >>> theta = hs.generate_state(10, kind="sync", noise=0, seed=0)
     >>> float(np.std(theta))
     0.0

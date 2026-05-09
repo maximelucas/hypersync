@@ -1,6 +1,6 @@
 import numpy as np
 
-import hypersync as hs
+import hypersynchronization as hs
 
 
 def test_identify_q_twisted():

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xgi
 
-import hypersync as hs
+import hypersynchronization as hs
 
 
 def test_simulate_kuramoto():

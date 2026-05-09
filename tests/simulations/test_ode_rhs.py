@@ -1,7 +1,7 @@
 import numpy as np
 import xgi
 
-import hypersync as hs
+import hypersynchronization as hs
 
 
 def test_rhs_23_sym(hypergraph0, state1):

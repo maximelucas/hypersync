@@ -5,4 +5,4 @@ from .analysis import *
 from .drawing import *
 from .simulation import *
 
-__version__ = version("hypersync")
+__version__ = version("hypersynchronization")

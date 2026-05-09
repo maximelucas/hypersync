@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hypersync"
+name = "hypersynchronization"
 version = "0.1"
 description = "HyperSync is Python for the simulation, analysis, and visualization of the synchronisations of oscillators with group (higher-order) interactions."
 authors = [
   { name = "Maxime Lucas", email = "maxime.lucas.work@gmail.com" },
 ]
 requires-python = ">=3.10"
-license = {file = "LICENSE.md"}
+license = {file = "LICENSE"}
 readme = "README.md"
 keywords = ["synchronization", "kuramoto", "higher-order interactions", "hypergraph", "complex systems"]
 classifiers = [

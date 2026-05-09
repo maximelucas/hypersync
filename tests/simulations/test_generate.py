@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-import hypersync as hs
+import hypersynchronization as hs
 
 
 def test_generate_q_twisted_state():

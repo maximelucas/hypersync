@@ -59,7 +59,7 @@ def identify_state(thetas, atol=1e-3):
     Examples
     --------
     >>> import numpy as np
-    >>> import hypersync as hs
+    >>> import hypersynchronization as hs
     >>> hs.identify_state(np.zeros(10))
     '0-twisted'
     >>> theta = hs.generate_q_twisted_state(10, q=1, noise=0)
@@ -141,7 +141,7 @@ def identify_k_clusters(thetas, k, atol=1e-2):
     Examples
     --------
     >>> import numpy as np
-    >>> import hypersync as hs
+    >>> import hypersynchronization as hs
     >>> theta = np.array([0.0] * 5 + [np.pi] * 5)
     >>> is_2clust, sizes = hs.identify_k_clusters(theta, k=2)
     >>> is_2clust, sizes
@@ -227,7 +227,7 @@ def identify_q_twisted(thetas, atol=1e-1):
 
     Examples
     --------
-    >>> import hypersync as hs
+    >>> import hypersynchronization as hs
     >>> theta = hs.generate_q_twisted_state(10, q=2, noise=0)
     >>> q, is_twisted = hs.identify_q_twisted(theta)
     >>> q, is_twisted
@@ -281,7 +281,7 @@ def order_parameter(thetas, order=1, complex=False, axis=0):
     Examples
     --------
     >>> import numpy as np
-    >>> import hypersync as hs
+    >>> import hypersynchronization as hs
     >>> theta = np.zeros(10)  # fully synchronized
     >>> hs.order_parameter(theta)
     1.0

@@ -25,10 +25,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 
-[project.urls]
-Homepage = "https://github.com/maximelucas/hypersync"
-Repository = "https://github.com/maximelucas/hypersync"
-Issues = "https://github.com/maximelucas/hypersync/issues"
 dependencies = [
     "numpy>=1.20",
     "scipy>=1.8",
@@ -37,6 +33,11 @@ dependencies = [
     "seaborn>=0.12",
     "numba>=0.59",
 ]
+
+[project.urls]
+Homepage = "https://github.com/maximelucas/hypersync"
+Repository = "https://github.com/maximelucas/hypersync"
+Issues = "https://github.com/maximelucas/hypersync/issues"
 
 [project.optional-dependencies]
 test = [

@@ -1,6 +1,6 @@
-# hypersync
+# hypersynchronization
 
-hypersync provides code for the simulation, analysis, and visualization of oscillators with group (higher-order) interactions.
+hypersynchronization is a Python library for the simulation, analysis, and visualization of oscillators with group (higher-order) interactions.
 
 
 ## Getting started
@@ -13,7 +13,7 @@ import numpy as np
 import seaborn as sb
 import xgi
 
-import hypersync as hs
+import hypersynchronization as hs
 
 sb.set_theme(style="ticks", context="notebook")
 
@@ -33,13 +33,13 @@ dt = 0.01
 integrator = "RK45"
 
 # generate initial contitions
-psi_init = hs.generate_state(N, kind="random")
+theta_0 = hs.generate_state(N, kind="random")
 
 # simulate system
 thetas, times = hs.simulate_kuramoto(
     H,
     omega=np.random.normal(size=N),
-    theta_0=psi_init,
+    theta_0=theta_0,
     t_end=t_end,
     dt=dt,
     rhs=hs.rhs_23_sym, 
@@ -56,7 +56,7 @@ plt.show()
 
 ## Credits
 
-hypersync makes use of [XGI](https://xgi.readthedocs.io/en/stable/) for higher-order interactions and Scipy's [solve_ivp()](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html) for ODE integration.
+hypersynchronization makes use of [XGI](https://xgi.readthedocs.io/en/stable/) for higher-order interactions and Scipy's [solve_ivp()](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html) for ODE integration.
 
 Released under the 3-Clause BSD license.
 

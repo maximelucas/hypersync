@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hypersynchronization"
 version = "0.1"
-description = "HyperSync is Python for the simulation, analysis, and visualization of the synchronisations of oscillators with group (higher-order) interactions."
+description = "hypersynchronization is a Python library for the simulation, analysis, and visualization of synchronization in oscillators with higher-order interactions."
 authors = [
   { name = "Maxime Lucas", email = "maxime.lucas.work@gmail.com" },
 ]
@@ -35,9 +35,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/maximelucas/hypersync"
-Repository = "https://github.com/maximelucas/hypersync"
-Issues = "https://github.com/maximelucas/hypersync/issues"
+Homepage = "https://github.com/maximelucas/hypersynchronization"
+Repository = "https://github.com/maximelucas/hypersynchronization"
+Issues = "https://github.com/maximelucas/hypersynchronization/issues"
 
 [project.optional-dependencies]
 test = [

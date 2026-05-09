@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hypersynchronization"
-version = "0.1"
+version = "0.2"
 description = "hypersynchronization is a Python library for the simulation, analysis, and visualization of synchronization in oscillators with higher-order interactions."
 authors = [
   { name = "Maxime Lucas", email = "maxime.lucas.work@gmail.com" },

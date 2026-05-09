@@ -8,8 +8,6 @@ import seaborn as sb
 import xgi
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
-import hypersync as hs
-
 __all__ = [
     "plot_series",
     "plot_order_param",

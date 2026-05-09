@@ -26,7 +26,7 @@ __all__ = [
 
 def rhs_23_sym(t, psi, omega, k1, k2, links, triangles):
     """
-    ODE RHS for coupled oscillators on any hypergraph.
+    Right-hand side of the ODE, for any hypergraphs with links and triangles.
 
     The coupling functions are:
     * sin(Oj - Oi)
@@ -434,6 +434,10 @@ def rhs_23_asym_nb(t, theta, omega, k1, k2):
             pairwise[ii] += sin(theta[jjj] - theta[ii])
 
             for kk in range(N):
+
+                if jj==kk or ii==kk or ii==jj:
+                    continue
+
                 jjj = (ii + jj) % N
                 kkk = (ii + kk) % N
                 triplets[ii] += sin(-theta[kkk] + 2 * theta[jjj] - theta[ii])

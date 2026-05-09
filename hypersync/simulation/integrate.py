@@ -51,7 +51,7 @@ def simulate_kuramoto(
         Integration method to use. Either "explicit_euler" (default) or any method supported by
         scipy.integrate.solve_ivp.
     args : tuple
-        Arguments to pass to the `rhs` function (other that `t`, `theta`, and `omega`).
+        Arguments to pass to the `rhs` function, in order (other that `t`, `theta`, and `omega`).
         (Default: None, which raises an error).
     **options:
         Additional keyword arguments to be passed to scipy's solve_ivp in case `integrator`

@@ -55,8 +55,8 @@ def generate_k_clusters(N, k, ps, noise=1e-2, seed=None):
     k : int
         The number of clusters to generate.
     ps : array-like
-        The probabilities of each cluster. The number of elements in `ps` must be equal to `k`,
-        and the sum of probabilities must be approximately 1.
+        The proportion of oscillators in each cluster. The number of elements in `ps` must be equal to `k`,
+        and the sum of probabilities must be 1.
     noise : float, optional
         The magnitude of gaussian noise added to the phases. Default is 1e-2.
     seed : int or None, optional

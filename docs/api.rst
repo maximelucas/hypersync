@@ -1,13 +1,15 @@
 API reference
 =============
 
+.. currentmodule:: hypersynchronization
+
 Simulation
 ----------
 
 .. autosummary::
    :toctree: generated/
 
-   hypersynchronization.simulate_kuramoto
+   simulate_kuramoto
 
 Initial conditions
 ------------------
@@ -15,9 +17,9 @@ Initial conditions
 .. autosummary::
    :toctree: generated/
 
-   hypersynchronization.generate_state
-   hypersynchronization.generate_k_clusters
-   hypersynchronization.generate_q_twisted_state
+   generate_state
+   generate_k_clusters
+   generate_q_twisted_state
 
 RHS functions
 -------------
@@ -25,17 +27,17 @@ RHS functions
 .. autosummary::
    :toctree: generated/
 
-   hypersynchronization.rhs_23_sym
-   hypersynchronization.rhs_pairwise_a2a
-   hypersynchronization.rhs_pairwise_meso
-   hypersynchronization.rhs_pairwise_adj
-   hypersynchronization.rhs_pairwise_a2a_harmonic
-   hypersynchronization.rhs_triplet_sym_meso
-   hypersynchronization.rhs_triplet_asym_meso
-   hypersynchronization.rhs_23_sym_nb
-   hypersynchronization.rhs_23_asym_nb
-   hypersynchronization.rhs_ring_23_sym_nb
-   hypersynchronization.rhs_ring_23_asym_nb
+   rhs_23_sym
+   rhs_pairwise_a2a
+   rhs_pairwise_meso
+   rhs_pairwise_adj
+   rhs_pairwise_a2a_harmonic
+   rhs_triplet_sym_meso
+   rhs_triplet_asym_meso
+   rhs_23_sym_nb
+   rhs_23_asym_nb
+   rhs_ring_23_sym_nb
+   rhs_ring_23_asym_nb
 
 Analysis
 --------
@@ -43,10 +45,10 @@ Analysis
 .. autosummary::
    :toctree: generated/
 
-   hypersynchronization.order_parameter
-   hypersynchronization.identify_state
-   hypersynchronization.identify_k_clusters
-   hypersynchronization.identify_q_twisted
+   order_parameter
+   identify_state
+   identify_k_clusters
+   identify_q_twisted
 
 Drawing
 -------
@@ -54,10 +56,10 @@ Drawing
 .. autosummary::
    :toctree: generated/
 
-   hypersynchronization.plot_summary
-   hypersynchronization.plot_sync
-   hypersynchronization.plot_series
-   hypersynchronization.plot_order_param
-   hypersynchronization.plot_phases
-   hypersynchronization.plot_phases_line
-   hypersynchronization.plot_phases_ring
+   plot_summary
+   plot_sync
+   plot_series
+   plot_order_param
+   plot_phases
+   plot_phases_line
+   plot_phases_ring

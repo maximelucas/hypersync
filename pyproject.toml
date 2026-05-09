@@ -53,7 +53,7 @@ dev = [
 doc = [
     "sphinx~=6.0",
     "sphinx-copybutton",
-    "sphinx-rtd-theme>=1.2",
+    "pydata-sphinx-theme>=0.15",
     "sphinx-design",
     "numpydoc>=1.1",
     "pillow>=8.2",

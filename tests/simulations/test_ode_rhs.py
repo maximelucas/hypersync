@@ -5,6 +5,50 @@ import xgi
 import hypersync as hs
 
 
+def test_rhs_23_sym(hypergraph0, state1):
+
+    omega = 0
+    k1 = 1
+    k2 = 1
+    H = hypergraph0
+    H = xgi.convert_labels_to_integers(H, "label")
+    links = H.edges.filterby("order", 1).members()
+    triangles = H.edges.filterby("order", 2).members()
+
+    # sync state: pairwise and triplet terms vanish
+    theta_sync = np.ones(H.num_nodes)
+    psi_out = hs.rhs_23_sym(0, theta_sync, omega, k1, k2, links, triangles)
+    assert np.allclose(psi_out, 0)
+
+    # output shape
+    psi_out = hs.rhs_23_sym(0, state1, omega, k1, k2, links, triangles)
+    assert psi_out.shape == (H.num_nodes,)
+
+    # random ic against reference values
+    assert np.allclose(
+        psi_out,
+        [0.37129268, -0.55189841, 0.49544906, -0.11487624, -0.21826764],
+        atol=1e-6,
+    )
+
+    # omega shifts result uniformly
+    omega_arr = np.ones(H.num_nodes) * 2.5
+    psi_out_omega = hs.rhs_23_sym(0, state1, omega_arr, k1, k2, links, triangles)
+    assert np.allclose(psi_out_omega, psi_out + 2.5)
+
+    # k1=0: pairwise term vanishes, only triplet remains
+    psi_k1 = hs.rhs_23_sym(0, state1, omega, k1=0, k2=1, links=links, triangles=triangles)
+    psi_k2 = hs.rhs_23_sym(0, state1, omega, k1=1, k2=0, links=links, triangles=triangles)
+    psi_both = hs.rhs_23_sym(0, state1, omega, k1=1, k2=1, links=links, triangles=triangles)
+    assert np.allclose(psi_k1 + psi_k2, psi_both)
+
+    # empty hypergraph: no coupling, returns omega
+    H_empty = xgi.Hypergraph()
+    H_empty.add_nodes_from(range(5))
+    psi_out = hs.rhs_23_sym(0, state1, omega, k1, k2, links=[], triangles=[])
+    assert np.allclose(psi_out, omega)
+
+
 def test_rhs_pairwise_a2a(state2):
 
     omega = 1

@@ -43,3 +43,4 @@ plug it in, and get time series, order parameters, and phase plots.
 
    getting-started
    api
+   auto_examples/index

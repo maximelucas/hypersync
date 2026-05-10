@@ -1,4 +1,5 @@
 import hypersynchronization
+from sphinx_gallery.sorting import ExplicitOrder
 
 project = "hypersynchronization"
 author = "Maxime Lucas"
@@ -12,6 +13,7 @@ extensions = [
     "numpydoc",
     "sphinx_copybutton",
     "sphinx_design",
+    "sphinx_gallery.gen_gallery",
 ]
 
 autosummary_generate = True
@@ -21,6 +23,17 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "scipy": ("https://docs.scipy.org/doc/scipy", None),
+}
+
+sphinx_gallery_conf = {
+    "examples_dirs": ["../examples"],
+    "gallery_dirs": ["auto_examples"],
+    "filename_pattern": r"plot_",
+    "subsection_order": ExplicitOrder([
+        "../examples/states",
+        "../examples/simulate",
+        "../examples/visualize",
+    ]),
 }
 
 html_theme = "pydata_sphinx_theme"

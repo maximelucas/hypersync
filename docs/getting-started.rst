@@ -12,26 +12,47 @@ and triplet interactions on a random hypergraph:
 
    import hypersynchronization as hs
 
-   N = 20
-   H = xgi.random_simplicial_complex(N, ps=[0.01, 0.015], seed=1)
+   N = 10 # number of nodes
+   rng = np.random.default_rng(42) # random seed for reproducibility
+
+   # generate hypergraph
+   H = xgi.fast_random_hypergraph(N, ps=[0.1, 0.05], seed=rng) 
    links = H.edges.filterby("order", 1).members()
    triangles = H.edges.filterby("order", 2).members()
 
-   k1 = 5
-   k2 = 0.1
+   # set dynamics parameters
+   k1, k2 = 3, 1
+   omega = rng.normal(0.2, 0.1, N)
+   theta_0 = hs.generate_state(N, kind="random", seed=rng)
 
-   theta_0 = hs.generate_state(N, kind="random")
-
+   # simulate dynamics
    thetas, times = hs.simulate_kuramoto(
        H,
-       omega=np.random.normal(size=N),
+       omega=omega,
        theta_0=theta_0,
-       t_end=300,
-       dt=0.01,
+       t_end=50,
+       dt=0.1,
        rhs=hs.rhs_23_sym,
        integrator="RK45",
        args=(k1, k2, links, triangles),
    )
 
-   hs.plot_summary(thetas, times, H)
+   # visualize results
+   fig, (ax1, ax2) = plt.subplots(
+       1, 2, width_ratios=[1, 3], figsize=(5, 2), layout="constrained", 
+   )
+
+   # draw hypergaph
+   pos = xgi.barycenter_spring_layout(H, seed=20)
+   xgi.draw(H, ax=ax1)
+
+   # draw timeseries
+   hs.plot_series(thetas, times, ax=ax2, alpha=0.3)
+
+   sb.despine()
    plt.show()
+
+
+.. image:: _static/example_about.png
+   :width: 70%
+   :align: center

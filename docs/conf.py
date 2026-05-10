@@ -40,8 +40,11 @@ html_title = "hypersynchronization"
 
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
+    "logo": {"text": "hypersynchronization"},
     "github_url": "https://github.com/maximelucas/hypersynchronization",
     "show_toc_level": 2,
 }
 
 exclude_patterns = ["_build"]
+
+html_static_path = ["_static"]

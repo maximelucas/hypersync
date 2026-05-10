@@ -3,14 +3,16 @@ hypersynchronization
 
 **Simulate, analyse, and visualize synchronization in oscillator networks with higher-order interactions.**
 
-hypersynchronization wraps `scipy's solve_ivp <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html>`_
-and `XGI <https://xgi.readthedocs.io>`_ to provide a modular pipeline for
+`hypersynchronization <https://github.com/maximelucas/hypersynchronization>`_ is a Python library that provides a modular pipeline for
 Kuramoto-type models on hypergraphs: define a right-hand side function,
 plug it in, and get time series, order parameters, and phase plots.
+hypersynchronization uses the power of `scipy's solve_ivp <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html>`_
+and `XGI <https://xgi.readthedocs.io>`_ higher-order interactions.
 
-.. code-block:: bash
 
-   pip install hypersynchronization
+.. image:: _static/example_about.png
+   :width: 80%
+   :align: center
 
 .. grid:: 3
    :gutter: 2
@@ -35,6 +37,14 @@ plug it in, and get time series, order parameters, and phase plots.
 
       Plot time series, phase distributions, and summary panels
       with a single function call.
+
+
+Get started by installing with
+.. code-block:: bash
+
+   pip install hypersynchronization
+   
+hypersynchronization is released under `BSD 3-Clause License <https://github.com/maximelucas/hypersynchronization/blob/docs/LICENSE>`_.
 
 .. toctree::
    :maxdepth: 1

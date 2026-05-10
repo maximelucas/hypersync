@@ -7,7 +7,7 @@ hypersynchronization
 Kuramoto-type models on hypergraphs: define a right-hand side function,
 plug it in, and get time series, order parameters, and phase plots.
 hypersynchronization uses the power of `scipy's solve_ivp <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html>`_
-and `XGI <https://xgi.readthedocs.io>`_ higher-order interactions.
+to integrate ODEs and of `XGI <https://xgi.readthedocs.io>`_ for higher-order interactions.
 
 
 .. image:: _static/example_about.png
@@ -40,10 +40,10 @@ and `XGI <https://xgi.readthedocs.io>`_ higher-order interactions.
 
 
 Get started by installing with
-.. code-block:: bash
 
+.. code-block:: bash
    pip install hypersynchronization
-   
+
 hypersynchronization is released under `BSD 3-Clause License <https://github.com/maximelucas/hypersynchronization/blob/docs/LICENSE>`_.
 
 .. toctree::

@@ -4,6 +4,8 @@
 
 hypersynchronization is a Python library for the simulation, analysis, and visualization of oscillators with group (higher-order) interactions.
 
+Online docs: [hypersynchronization.readthedocs.io](https://hypersynchronization.readthedocs.io/en/latest/index.html)
+
 ## Installation
 
 ```bash
@@ -12,59 +14,14 @@ pip install hypersynchronization
 
 ## Getting started
 
-Here is a simple example to get started:
+Simulate and draw this with just a [few lines of code](https://hypersynchronization.readthedocs.io/en/latest/getting-started.html):
 
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sb
-import xgi
-
-import hypersynchronization as hs
-
-sb.set_theme(style="ticks", context="notebook")
-
-# structural parameters 
-N = 20 # number of nodes
-H = xgi.random_simplicial_complex(N, ps=[0.01, 0.015], seed=1) # hypergraph
-links = H.edges.filterby("order", 1).members()
-triangles = H.edges.filterby("order", 2).members()
-
-# dynamical parameters
-k1 = 5  # pairwise coupling strength
-k2 = 0.1  # triplet coupling strength
-
-# integration parameters
-t_end = 300
-dt = 0.01
-integrator = "RK45"
-
-# generate initial contitions
-theta_0 = hs.generate_state(N, kind="random")
-
-# simulate system
-thetas, times = hs.simulate_kuramoto(
-    H,
-    omega=np.random.normal(size=N),
-    theta_0=theta_0,
-    t_end=t_end,
-    dt=dt,
-    rhs=hs.rhs_23_sym, 
-    integrator=integrator,
-    args=(k1, k2, links, triangles), # arguments of the RHS function,
-)
-
-
-hs.plot_summary(thetas, times, H)
-
-plt.show()
-```
-<img src="https://github.com/user-attachments/assets/a6c40630-b960-416d-bfd8-dd4e02c10e80" width="65%">
+<img src="docs/_static/example_about.png" width="65%">
 
 ## Credits
 
-hypersynchronization makes use of [XGI](https://xgi.readthedocs.io/en/stable/) for higher-order interactions and Scipy's [solve_ivp()](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html) for ODE integration.
+hypersynchronization uses [XGI](https://xgi.readthedocs.io/en/stable/) for higher-order interactions and Scipy's [solve_ivp()](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html) for ODE integration.
 
-Released under the 3-Clause BSD license.
+Released under the [3-Clause BSD license](LICENSE).
 
-Maxime Lucas: maxime.lucas.work [at] gmail.com
+Developer: Maxime Lucas, maxime.lucas.work [at] gmail.com

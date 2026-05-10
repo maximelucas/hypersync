@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.976** total execution time for 8 files **from all galleries**:
+**00:00.195** total execution time for 9 files **from all galleries**:
 
 .. container::
 
@@ -32,27 +32,30 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_visualize_plot_summary_panel.py` (``../examples/visualize/plot_summary_panel.py``)
-     - 00:00.540
+   * - :ref:`sphx_glr_auto_examples_visualize_plot_phases_plots.py` (``../examples/visualize/plot_phases_plots.py``)
+     - 00:00.195
      - 0.0
    * - :ref:`sphx_glr_auto_examples_simulate_plot_simulation.py` (``../examples/simulate/plot_simulation.py``)
-     - 00:00.516
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_visualize_plot_sync_panel.py` (``../examples/visualize/plot_sync_panel.py``)
-     - 00:00.499
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_states_plot_splay.py` (``../examples/states/plot_splay.py``)
-     - 00:00.226
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_visualize_plot_phases_ring.py` (``../examples/visualize/plot_phases_ring.py``)
-     - 00:00.058
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_states_plot_2_twisted.py` (``../examples/states/plot_2_twisted.py``)
-     - 00:00.047
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_states_plot_sync.py` (``../examples/states/plot_sync.py``)
-     - 00:00.046
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_states_plot_2_cluster.py` (``../examples/states/plot_2_cluster.py``)
-     - 00:00.045
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_states_plot_2_twisted.py` (``../examples/states/plot_2_twisted.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_states_plot_splay.py` (``../examples/states/plot_splay.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_states_plot_sync.py` (``../examples/states/plot_sync.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_visualize_plot_phases_ring.py` (``../examples/visualize/plot_phases_ring.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_visualize_plot_summary_panel.py` (``../examples/visualize/plot_summary_panel.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_visualize_plot_sync_panel.py` (``../examples/visualize/plot_sync_panel.py``)
+     - 00:00.000
      - 0.0

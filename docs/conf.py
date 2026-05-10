@@ -36,6 +36,8 @@ sphinx_gallery_conf = {
     ]),
 }
 
+html_title = "hypersynchronization"
+
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "github_url": "https://github.com/maximelucas/hypersynchronization",

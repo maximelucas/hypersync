@@ -9,11 +9,6 @@ plug it in, and get time series, order parameters, and phase plots.
 hypersynchronization uses the power of `scipy's solve_ivp <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html>`_
 to integrate ODEs and of `XGI <https://xgi.readthedocs.io>`_ for higher-order interactions.
 
-
-.. image:: _static/example_about.png
-   :width: 80%
-   :align: center
-
 .. grid:: 3
    :gutter: 2
 
@@ -42,7 +37,16 @@ to integrate ODEs and of `XGI <https://xgi.readthedocs.io>`_ for higher-order in
 Get started by installing with
 
 .. code-block:: bash
+
    pip install hypersynchronization
+
+
+And simulate and draw this with just a few lines of code:
+
+.. image:: _static/example_about.png
+   :width: 60%
+   :align: center
+
 
 hypersynchronization is released under `BSD 3-Clause License <https://github.com/maximelucas/hypersynchronization/blob/docs/LICENSE>`_.
 
